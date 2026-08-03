@@ -1,0 +1,546 @@
+[
+  {
+    "name": "CapWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CapWorldHomeStage.png"
+  },
+  {
+    "name": "WaterFallWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/WaterFallWorldHomeStage.png"
+  },
+  {
+    "name": "SandWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldHomeStage.png"
+  },
+  {
+    "name": "LakeWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LakeWorldHomeStage.png"
+  },
+  {
+    "name": "ForestWorldHomeStage\\t",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldHomeStage.png"
+  },
+  {
+    "name": "CloudWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CloudWorldHomeStage.png"
+  },
+  {
+    "name": "ClashWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ClashWorldHomeStage.png"
+  },
+  {
+    "name": "CityWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CityWorldHomeStage.png"
+  },
+  {
+    "name": "SnowWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SnowWorldHomeStage.png"
+  },
+  {
+    "name": "SeaWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SeaWorldHomeStage.png"
+  },
+  {
+    "name": "LavaWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldHomeStage.png"
+  },
+  {
+    "name": "BossRaidWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/BossRaidWorldHomeStage.png"
+  },
+  {
+    "name": "SkyWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SkyWorldHomeStage.png"
+  },
+  {
+    "name": "MoonWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/MoonWorldHomeStage.png"
+  },
+  {
+    "name": "PeachWorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldHomeStage.png"
+  },
+  {
+    "name": "Special1WorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special1WorldHomeStage.png"
+  },
+  {
+    "name": "Special2WorldHomeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special2WorldHomeStage.png"
+  },
+  {
+    "name": "PushBlockExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PushBlockExStage.png"
+  },
+  {
+    "name": "PoisonWaveExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PoisonWaveExStage.png"
+  },
+  {
+    "name": "FrogSearchExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/FrogSearchExStage.png"
+  },
+  {
+    "name": "WanwanClashExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/WanwanClashExStage.png"
+  },
+  {
+    "name": "WindBlowExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/WindBlowExStage.png"
+  },
+  {
+    "name": "CapAppearExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CapAppearExStage.png"
+  },
+  {
+    "name": "TrexPoppunExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/TrexPoppunExStage.png"
+  },
+  {
+    "name": "SandWorldKillerExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldKillerExStage.png"
+  },
+  {
+    "name": "SandWorldSphinxExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldSphinxExStage.png"
+  },
+  {
+    "name": "SandWorldMeganeExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldMeganeExStage.png"
+  },
+  {
+    "name": "SandWorldRotateExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldRotateExStage.png"
+  },
+  {
+    "name": "RocketFlowerExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RocketFlowerExStage.png"
+  },
+  {
+    "name": "MeganeLiftExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/MeganeLiftExStage.png"
+  },
+  {
+    "name": "SandWorldPressExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldPressExStage.png"
+  },
+  {
+    "name": "SandWorldVibrationStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldVibrationStage.png"
+  },
+  {
+    "name": "WaterTubeExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/WaterTubeExStage.png"
+  },
+  {
+    "name": "TrampolineWallCatchExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/TrampolineWallCatchExStage.png"
+  },
+  {
+    "name": "FastenerExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/FastenerExStage.png"
+  },
+  {
+    "name": "GotogotonExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/GotogotonExStage.png"
+  },
+  {
+    "name": "FrogPoisonExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/FrogPoisonExStage.png"
+  },
+  {
+    "name": "ForestWorldWaterExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldWaterExStage.png"
+  },
+  {
+    "name": "RailCollisionExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RailCollisionExStage.png"
+  },
+  {
+    "name": "ShootingElevatorExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ShootingElevatorExStage.png"
+  },
+  {
+    "name": "FogMountainExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/FogMountainExStage.png"
+  },
+  {
+    "name": "ForestWorldBonusStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldBonusStage.png"
+  },
+  {
+    "name": "PackunPoisonExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PackunPoisonExStage.png"
+  },
+  {
+    "name": "KillerRoadExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/KillerRoadExStage.png"
+  },
+  {
+    "name": "ForestWorldCloudBonusExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldCloudBonusExStage.png"
+  },
+  {
+    "name": "AnimalChaseExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/AnimalChaseExStage.png"
+  },
+  {
+    "name": "ForestWorldWoodsStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldWoodsStage.png"
+  },
+  {
+    "name": "FukuwaraiKuriboStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/FukuwaraiKuriboStage.png"
+  },
+  {
+    "name": "ImomuPoisonExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ImomuPoisonExStage.png"
+  },
+  {
+    "name": "JangoExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/JangoExStage.png"
+  },
+  {
+    "name": "ElectricWireExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ElectricWireExStage.png"
+  },
+  {
+    "name": "CapRotatePackunExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CapRotatePackunExStage.png"
+  },
+  {
+    "name": "TrexBikeExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/TrexBikeExStage.png"
+  },
+  {
+    "name": "SwingSteelExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SwingSteelExStage.png"
+  },
+  {
+    "name": "DonsukeExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/DonsukeExStage.png"
+  },
+  {
+    "name": "CityPeopleRoadStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CityPeopleRoadStage.png"
+  },
+  {
+    "name": "PoleKillerExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PoleKillerExStage.png"
+  },
+  {
+    "name": "PoleGrabCeilExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PoleGrabCeilExStage.png"
+  },
+  {
+    "name": "ShootingCityExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ShootingCityExStage.png"
+  },
+  {
+    "name": "BikeSteelExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/BikeSteelExStage.png"
+  },
+  {
+    "name": "IceWaterDashExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/IceWaterDashExStage.png"
+  },
+  {
+    "name": "IceWaterBlockExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/IceWaterBlockExStage.png"
+  },
+  {
+    "name": "ByugoPuzzleExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ByugoPuzzleExStage.png"
+  },
+  {
+    "name": "IceWalkerExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/IceWalkerExStage.png"
+  },
+  {
+    "name": "SnowWorldCloudBonusStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SnowWorldCloudBonusStage.png"
+  },
+  {
+    "name": "KillerRailCollisionExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/KillerRailCollisionExStage.png"
+  },
+  {
+    "name": "SnowWorldLobbyExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SnowWorldLobbyExStage.png"
+  },
+  {
+    "name": "WaterValleyExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/WaterValleyExStage.png"
+  },
+  {
+    "name": "CloudExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CloudExStage.png"
+  },
+  {
+    "name": "TogezoRotateExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/TogezoRotateExStage.png"
+  },
+  {
+    "name": "SenobiTowerExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SenobiTowerExStage.png"
+  },
+  {
+    "name": "ReflectBombExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ReflectBombExStage.png"
+  },
+  {
+    "name": "SeaWorldUtsuboCaveStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SeaWorldUtsuboCaveStage.png"
+  },
+  {
+    "name": "SeaWorldSneakingManStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SeaWorldSneakingManStage.png"
+  },
+  {
+    "name": "SeaWorldVibrationStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SeaWorldVibrationStage.png"
+  },
+  {
+    "name": "ForkExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForkExStage.png"
+  },
+  {
+    "name": "CapAppearLavaLiftExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CapAppearLavaLiftExStage.png"
+  },
+  {
+    "name": "GabuzouClockExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/GabuzouClockExStage.png"
+  },
+  {
+    "name": "LavaWorldBubbleLaneExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldBubbleLaneExStage.png"
+  },
+  {
+    "name": "LavaWorldExcavationExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldExcavationExStage.png"
+  },
+  {
+    "name": "LavaWorldUpDownExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldUpDownExStage.png"
+  },
+  {
+    "name": "LavaWorldClockExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldClockExStage.png"
+  },
+  {
+    "name": "LavaWorldFenceLiftExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldFenceLiftExStage.png"
+  },
+  {
+    "name": "LavaWorldTreasureStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldTreasureStage.png"
+  },
+  {
+    "name": "LavaBonus1Zone",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaBonus1Zone.png"
+  },
+  {
+    "name": "BullRunExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/BullRunExStage.png"
+  },
+  {
+    "name": "DotTowerExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/DotTowerExStage.png"
+  },
+  {
+    "name": "JizoSwitchExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/JizoSwitchExStage.png"
+  },
+  {
+    "name": "TsukkunRotateExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/TsukkunRotateExStage.png"
+  },
+  {
+    "name": "TsukkunClimbExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/TsukkunClimbExStage.png"
+  },
+  {
+    "name": "SkyWorldCloudBonusExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SkyWorldCloudBonusExStage.png"
+  },
+  {
+    "name": "SkyWorldTreasureStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SkyWorldTreasureStage.png"
+  },
+  {
+    "name": "MoonAthleticExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/MoonAthleticExStage.png"
+  },
+  {
+    "name": "MoonWorldSpinxRoom",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/MoonWorldSpinxRoom.png"
+  },
+  {
+    "name": "YoshiCloudExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/YoshiCloudExStage.png"
+  },
+  {
+    "name": "DotHardExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/DotHardExStage.png"
+  },
+  {
+    "name": "FukuwaraiMarioStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/FukuwaraiMarioStage.png"
+  },
+  {
+    "name": "PeachWorldCastleStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldCastleStage.png"
+  },
+  {
+    "name": "PeachWorldPictureBossForestStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldPictureBossForestStage.png"
+  },
+  {
+    "name": "PeachWorldPictureBossKnuckleStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldPictureBossKnuckleStage.png"
+  },
+  {
+    "name": "PeachWorldPictureBossMagmaStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldPictureBossMagmaStage.png"
+  },
+  {
+    "name": "PeachWorldPictureMofumofuStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldPictureMofumofuStage.png"
+  },
+  {
+    "name": "PeachWorldPictureBossRaidStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldPictureBossRaidStage.png"
+  },
+  {
+    "name": "PeachWorldPictureGiantWanderBossStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PeachWorldPictureGiantWanderBossStage.png"
+  },
+  {
+    "name": "Special1WorldTowerStackerStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special1WorldTowerStackerStage.png"
+  },
+  {
+    "name": "Special1WorldTowerBombTailStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special1WorldTowerBombTailStage.png"
+  },
+  {
+    "name": "Special1WorldTowerFireBlowerStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special1WorldTowerFireBlowerStage.png"
+  },
+  {
+    "name": "Special1WorldTowerCapThrowerStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special1WorldTowerCapThrowerStage.png"
+  },
+  {
+    "name": "BikeSteelNoCapExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/BikeSteelNoCapExStage.png"
+  },
+  {
+    "name": "PackunPoisonNoCapExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/PackunPoisonNoCapExStage.png"
+  },
+  {
+    "name": "KillerRoadNoCapExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/KillerRoadNoCapExStage.png"
+  },
+  {
+    "name": "ShootingCityYoshiExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ShootingCityYoshiExStage.png"
+  },
+  {
+    "name": "SenobiTowerYoshiExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SenobiTowerYoshiExStage.png"
+  },
+  {
+    "name": "LavaWorldUpDownYoshiExStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldUpDownYoshiExStage.png"
+  },
+  {
+    "name": "Special2WorldLavaStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special2WorldLavaStage.png"
+  },
+  {
+    "name": "ForestWorldWoodsTreasureStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldWoodsTreasureStage.png"
+  },
+  {
+    "name": "KaronWingTowerStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/KaronWingTowerStage.png"
+  },
+  {
+    "name": "CityWorldFactoryStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CityWorldFactoryStage.png"
+  },
+  {
+    "name": "ForestWorldBossStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldBossStage.png"
+  },
+  {
+    "name": "ForestWorldTowerStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldTowerStage.png"
+  },
+  {
+    "name": "MoonWorldCaptureParadeStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/MoonWorldCaptureParadeStage.png"
+  },
+  {
+    "name": "MoonWorldWeddingRoomStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/MoonWorldWeddingRoomStage.png"
+  },
+  {
+    "name": "RevengeForestBossStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RevengeForestBossStage.png"
+  },
+  {
+    "name": "RevengeBossKnuckleStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RevengeBossKnuckleStage.png"
+  },
+  {
+    "name": "RevengeBossMagmaStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RevengeBossMagmaStage.png"
+  },
+  {
+    "name": "RevengeBossRaidStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RevengeBossRaidStage.png"
+  },
+  {
+    "name": "RevengeGiantWanderBossStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RevengeGiantWanderBossStage.png"
+  },
+  {
+    "name": "RevengeMofumofuStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/RevengeMofumofuStage.png"
+  },
+  {
+    "name": "SandWorldPyramid000Stage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldPyramid000Stage.png"
+  },
+  {
+    "name": "SandWorldPyramid001Stage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldPyramid001Stage.png"
+  },
+  {
+    "name": "SandWorldUnderground000Stage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldUnderground000Stage.png"
+  },
+  {
+    "name": "SandWorldUnderground001Stage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldUnderground001Stage.png"
+  },
+  {
+    "name": "SnowWorldTownStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SnowWorldTownStage.png"
+  },
+  {
+    "name": "SnowWorldLobby000Stage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SnowWorldLobby000Stage.png"
+  },
+  {
+    "name": "Special2WorldCloudStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special2WorldCloudStage.png"
+  },
+  {
+    "name": "Special2WorldKoopaStage",
+    "image": "https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/Special2WorldKoopaStage.png"
+  }
+]

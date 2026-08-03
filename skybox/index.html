@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Mario Odyssey - Skybox Gallery</title>
+<style>
+  /* Makes padding/border count INSIDE an element's declared width/height,
+     instead of adding on top of it. Keeps every size calc below predictable. */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background-color: #121212; /* page background - dark theme base color */
+    color: #e6e6e6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* ===================== PAGE HEADER ===================== */
+  header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: #8ab4f8;
+    text-decoration: none;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  header h1 {
+    margin: 0 0 4px;
+    font-size: 1.4rem; /* title text size */
+  }
+
+  header p {
+    margin: 0;
+    color: #999; /* subtitle text color - dimmer than the title */
+    font-size: 13px;
+  }
+
+  .page-body {
+    padding: 20px 24px 40px; /* space around the map box below the header */
+  }
+
+  /* =========================================================
+     CONNECTION MAP
+     This is the big scrollable box holding all 136 skybox cards.
+     Structure (outer to inner):
+       .connection-map-container  <- fixed-size dark box, clips overflow
+         .map-canvas-viewport     <- the part that actually scrolls
+           .map-canvas-inner      <- huge canvas, sized by JS to fit
+                                      every card, cards are positioned
+                                      absolutely inside it
+     ========================================================= */
+
+  .connection-map-container {
+    position: relative;
+    background-color: #121212;
+    height: 80vh;       /* map box takes up 80% of the browser's visible height */
+    min-height: 500px;  /* but never shrinks below this, even on short screens */
+    overflow: hidden;   /* clips anything outside the box's rounded corners */
+    border-radius: 8px;
+    border: 1px solid #333;
+  }
+
+  .map-canvas-viewport {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: auto; /* THIS is what actually creates the scrollbars */
+
+    /* Dot-grid background lives here (on the viewport), not on the inner
+       canvas. This is what fixes the "black void" bug: since this covers
+       the ENTIRE scrollable area no matter what, there's no way for a
+       sizing mismatch between the canvas and its content to leave a
+       plain black gap anywhere. */
+    background-color: #121212;
+    background-image: radial-gradient(#2c2c2c 1px, transparent 1px);
+    background-size: 24px 24px; /* spacing between dots - bigger number = sparser dots */
+  }
+
+  .map-canvas-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    /* No background here anymore - it lives on .map-canvas-viewport above.
+       This element's only job now is to be a positioning anchor that JS
+       resizes (see renderCanvasMap() below) so the scrollbars know how
+       far there is to scroll. */
+  }
+
+  /* Little "Made by ..." pill, bottom-left of the map */
+  .map-footer-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: flex-start; /* pill sticks to the left; used to also hold a zoom slider on the right, removed */
+    align-items: center;
+    box-sizing: border-box;
+    pointer-events: none; /* lets clicks "pass through" this bar to the map underneath, except... */
+    z-index: 10;
+  }
+
+  .map-footer-badge {
+    background-color: #1e1f22;
+    border: 1px solid #35363c;
+    color: #95969d;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: auto; /* ...the badge itself re-enables clicks/selection, in case you want to select its text */
+  }
+
+  /* Dark, theme-matched scrollbars instead of the browser's default
+     light/white ones. -webkit- rules affect Chrome/Edge/Safari;
+     scrollbar-color/width below covers Firefox. */
+  .map-canvas-viewport::-webkit-scrollbar {
+    width: 12px;  /* thickness of the vertical scrollbar */
+    height: 12px; /* thickness of the horizontal scrollbar */
+  }
+
+  .map-canvas-viewport::-webkit-scrollbar-track {
+    background: #1a1a1a; /* the scrollbar's background "groove" */
+  }
+
+  .map-canvas-viewport::-webkit-scrollbar-thumb {
+    background-color: #3d3d3d; /* the draggable scrollbar handle itself */
+    border-radius: 6px;
+    border: 3px solid #1a1a1a; /* creates a bit of padding around the handle */
+  }
+
+  .map-canvas-viewport::-webkit-scrollbar-thumb:hover {
+    background-color: #4d4d4d; /* slightly lighter on hover, for feedback */
+  }
+
+  .map-canvas-viewport {
+    scrollbar-color: #3d3d3d #1a1a1a; /* Firefox: thumb color, then track color */
+    scrollbar-width: thin;
+  }
+
+  .map-instructions {
+    position: absolute;
+    bottom: 50px;
+    left: 20px;
+    color: #888;
+    font-size: 13px;
+    font-style: italic;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* ===================== INDIVIDUAL SKYBOX CARD ===================== */
+  .rendered-group-box {
+    position: absolute; /* JS sets .style.left / .style.top per card to place it in the grid */
+    background-color: rgba(30, 31, 34, 0.9);
+    border: 1px solid #3f4147;
+    border-radius: 8px;
+    padding: 14px;
+    width: 240px; /* card width - also referenced as `cardWidth` in the JS grid math below, keep them matching */
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+
+  .rendered-group-title {
+    font-weight: 600;
+    font-size: 13px; /* starting size - shrinkTitlesToFit() in the JS below may shrink this per-card if a name is too long */
+    color: #ffffff;
+    background-color: #2b2d31;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: block;
+    margin-bottom: 10px;
+    border-left: 4px solid #5865F2; /* the blue accent stripe */
+    white-space: nowrap;  /* never wrap to a 2nd line - font shrinks to fit instead */
+    overflow: hidden;     /* safety net in case a name is too long even at minimum font size */
+  }
+
+  .rendered-node-badge {
+    background-color: #2b2d31;
+    border: 1px solid #3f4147;
+    color: #dbdee1;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* ===================== IMAGE ZOOM LIGHTBOX =====================
+     The full-screen popup that appears when you click a skybox image. */
+  .zoomable-node-image {
+    cursor: zoom-in; /* magnifying-glass cursor, hints it's clickable */
+    transition: opacity 0.15s ease;
+  }
+
+  .zoomable-node-image:hover {
+    opacity: 0.85; /* subtle dim-on-hover feedback */
+  }
+
+  .modal-overlay {
+    display: none; /* hidden by default - JS adds the .open class to show it */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0; /* covers the entire browser window */
+    background-color: rgba(0,0,0,0.75); /* dark dimmed backdrop behind the popup */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* sits above everything else on the page */
+  }
+
+  .modal-overlay.open { display: flex; } /* toggled on/off by JS to show/hide the popup */
+
+  .image-lightbox-content {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    width: auto;
+    max-width: 92vw;  /* never wider than 92% of the browser window */
+    max-height: 92vh; /* never taller than 92% of the browser window */
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative; /* lets the close button below position itself relative to this */
+  }
+
+  .image-lightbox-content img {
+    max-width: 92vw;
+    max-height: 85vh;
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+    display: block;
+  }
+
+  .image-lightbox-close {
+    position: absolute;
+    top: -36px; /* sits just above the image, not overlapping it */
+    right: 0;
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 28px; /* the "×" symbol size */
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .image-lightbox-close:hover { color: #a3e6be; }
+
+  .image-lightbox-caption {
+    color: #cccccc;
+    font-size: 13px;
+    margin-top: 10px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="../">&larr; Back to Hub</a>
+  <h1>Super Mario Odyssey - Skybox Gallery</h1>
+  <p>All documented skyboxes, one per stage. Click any image to zoom.</p>
+</header>
+
+<div class="page-body">
+  <div class="connection-map-container">
+    <div class="map-canvas-viewport" id="mapCanvasViewport">
+      <!-- JS fills this with one .rendered-group-box per skybox -->
+      <div class="map-canvas-inner" id="mapCanvasInner">
+        <!-- Grid layout of group boxes renders here -->
+      </div>
+    </div>
+    <div class="map-instructions" id="mapInstructions">Loading...</div>
+    <div class="map-footer-bar">
+      <div class="map-footer-badge">Made by FireRisingRaging, Onijuiku, and BaconFearMC</div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Zoom Lightbox: hidden by default, shown by JS when a skybox image is clicked -->
+<div class="modal-overlay" id="imageLightbox">
+  <div class="image-lightbox-content">
+    <button class="image-lightbox-close" id="closeLightboxBtn">&times;</button>
+    <img id="lightboxImg" src="" alt="Zoomed node image" />
+    <div class="image-lightbox-caption" id="lightboxCaption"></div>
+  </div>
+</div>
+
+<script>
+  // Holds all 136 skyboxes once loaded from skybox.json. Each entry looks
+  // like { name: "CapWorldHomeStage", nodes: [{ image: "https://..." }] }
+  // (the "nodes" wrapper is a leftover shape from the original Apps Script
+  // version - kept as-is so renderCanvasMap() below didn't need rewriting).
+  let staticMapGroups = [];
+
+  // Fetches skybox.json (must sit in the same folder as this HTML file)
+  // and kicks off the first render once it's loaded.
+  async function loadSkyboxData() {
+    const res = await fetch('skybox.json');
+    const data = await res.json();
+    staticMapGroups = data.map(entry => ({
+      name: entry.name,
+      nodes: [{ image: entry.image || '' }]
+    }));
+    renderCanvasMap();
+  }
+
+  // Builds every skybox card and places it on the grid. Runs once on load;
+  // if you ever add a "refresh data" button later, just call this again.
+  function renderCanvasMap() {
+    const innerCanvas = document.getElementById('mapCanvasInner');
+    const instructions = document.getElementById('mapInstructions');
+    if (!innerCanvas) return;
+
+    innerCanvas.innerHTML = ''; // clear out any previous render before rebuilding
+
+    if (staticMapGroups.length === 0) {
+      if (instructions) instructions.textContent = "No connections configured.";
+      return;
+    }
+
+    if (instructions) instructions.textContent = "Skybox Grid.";
+
+    // ---- GRID LAYOUT SETTINGS ----
+    // This is the block to edit if you want to change spacing/sizing later.
+    const cols = 6;          // how many cards per row before wrapping to a new row
+    const startX = 60;       // pixels from the left edge to the first column
+    const startY = 60;       // pixels from the top edge to the first row
+    const gapX = 290;        // horizontal distance between the START of one card and the next (must be >= cardWidth or cards overlap)
+    const gapY = 230;        // vertical distance between the START of one row and the next
+    const cardWidth = 240;   // must match .rendered-group-box's `width` in the CSS above
+    const cardEstHeight = 205; // rough estimate of a card's rendered height (image + title) - only used to size the scrollable area, doesn't need to be exact
+
+    const rows = Math.ceil(staticMapGroups.length / cols); // how many rows we need for however many skyboxes exist
+
+    // Size the invisible canvas to fit exactly what's there, plus a little
+    // breathing room past the last row/column - this is what the scrollbars
+    // measure against, so getting this right is what avoids both "can't
+    // scroll far enough to see everything" and "empty void past the content."
+    innerCanvas.style.width = (startX + (cols * gapX) + cardWidth - gapX + 40) + 'px';
+    innerCanvas.style.height = (startY + (rows * gapY) + cardEstHeight - gapY + 80) + 'px';
+
+    // Place every card in its grid slot
+    staticMapGroups.forEach((group, index) => {
+      const col = index % cols;           // which column this card falls in (0 to cols-1, then wraps)
+      const row = Math.floor(index / cols); // which row this card falls in
+
+      const groupBox = document.createElement('div');
+      groupBox.className = 'rendered-group-box';
+      groupBox.style.left = (startX + (col * gapX)) + 'px';
+      groupBox.style.top = (startY + (row * gapY)) + 'px';
+
+      // Title bar (the skybox's internal name)
+      let nodesHtml = `<div class="rendered-group-title">${group.name}</div>`;
+
+      // Image (or a placeholder if this skybox has no image URL yet)
+      group.nodes.forEach(node => {
+        if (node.image && node.image.trim() !== "") {
+          nodesHtml += `<div class="rendered-node-badge"><img src="${node.image}" alt="Node Image" class="zoomable-node-image" data-caption="${group.name}" style="max-width: 100%; height: auto; display: block; border-radius: 4px;" /></div>`;
+        } else {
+          nodesHtml += `<div class="rendered-node-badge" style="color: #777; font-style: italic;">No Image</div>`;
+        }
+      });
+
+      groupBox.innerHTML = nodesHtml;
+      innerCanvas.appendChild(groupBox);
+    });
+
+    // Run AFTER all cards exist in the DOM, since it needs to measure their
+    // actual rendered width to decide whether/how much to shrink each title.
+    shrinkTitlesToFit();
+  }
+
+  // Auto-shrinks each title's font size (down to a floor of minFontSize)
+  // until it fits on one line, so long camelCase names like
+  // "PeachWorldPictureGiantWanderBossStage" never wrap and never spill
+  // into the neighboring card.
+  function shrinkTitlesToFit() {
+    const titles = document.querySelectorAll('.rendered-group-title');
+    const minFontSize = 9; // never shrink smaller than this, even for very long names
+
+    titles.forEach(title => {
+      let fontSize = 13; // starting size, matches the CSS default above
+      title.style.fontSize = fontSize + 'px';
+
+      // scrollWidth = how wide the text WANTS to be; clientWidth = how wide
+      // the box actually is. Keep shrinking half a pixel at a time until
+      // the text fits, or we hit the floor.
+      while (title.scrollWidth > title.clientWidth && fontSize > minFontSize) {
+        fontSize -= 0.5;
+        title.style.fontSize = fontSize + 'px';
+      }
+    });
+  }
+
+  // ===================== IMAGE ZOOM LIGHTBOX =====================
+  const imageLightbox = document.getElementById('imageLightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+
+  // Event delegation: one listener on the whole document instead of one
+  // per image. This matters because renderCanvasMap() wipes and rebuilds
+  // every card's HTML - individual listeners would get destroyed each
+  // rebuild, but a listener on `document` itself never goes away.
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('.zoomable-node-image');
+    if (!img) return; // click wasn't on a skybox image, ignore it
+    lightboxImg.src = img.src;
+    lightboxCaption.textContent = img.dataset.caption || '';
+    imageLightbox.classList.add('open');
+  });
+
+  // The "×" button
+  document.getElementById('closeLightboxBtn').addEventListener('click', () => {
+    imageLightbox.classList.remove('open');
+  });
+
+  // Clicking the dark backdrop (but not the image itself) also closes it
+  imageLightbox.addEventListener('click', (e) => {
+    if (e.target === imageLightbox) imageLightbox.classList.remove('open');
+  });
+
+  // Escape key closes it too
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && imageLightbox.classList.contains('open')) {
+      imageLightbox.classList.remove('open');
+    }
+  });
+
+  // Kick everything off
+  loadSkyboxData();
+</script>
+
+</body>
+</html>
