@@ -1,0 +1,546 @@
+[
+  {
+    "name": "CapWorldHomeStage",
+    "usedIn": "Cap Kingdom"
+  },
+  {
+    "name": "WaterFallWorldHomeStage",
+    "usedIn": "Cascade Kingdom"
+  },
+  {
+    "name": "SandWorldHomeStage",
+    "usedIn": "Sand Kingdom"
+  },
+  {
+    "name": "LakeWorldHomeStage",
+    "usedIn": "Lake Kingdom"
+  },
+  {
+    "name": "ForestWorldHomeStage",
+    "usedIn": "Wooded Kingdom"
+  },
+  {
+    "name": "CloudWorldHomeStage",
+    "usedIn": "Cloud Kingdom"
+  },
+  {
+    "name": "ClashWorldHomeStage",
+    "usedIn": "Lost Kingdom"
+  },
+  {
+    "name": "CityWorldHomeStage",
+    "usedIn": "Metro Kingdom"
+  },
+  {
+    "name": "SnowWorldHomeStage",
+    "usedIn": "Snow Kingdom"
+  },
+  {
+    "name": "SeaWorldHomeStage",
+    "usedIn": "Seaside Kingdom"
+  },
+  {
+    "name": "LavaWorldHomeStage",
+    "usedIn": "Luncheon Kingdom"
+  },
+  {
+    "name": "BossRaidWorldHomeStage",
+    "usedIn": "Ruined Kingdom"
+  },
+  {
+    "name": "SkyWorldHomeStage",
+    "usedIn": "Bowsers Kingdom"
+  },
+  {
+    "name": "MoonWorldHomeStage",
+    "usedIn": "Moon Kingdom"
+  },
+  {
+    "name": "PeachWorldHomeStage",
+    "usedIn": "Mushroom Kingdom"
+  },
+  {
+    "name": "Special1WorldHomeStage",
+    "usedIn": "Dark Side"
+  },
+  {
+    "name": "Special2WorldHomeStage",
+    "usedIn": "Darker Side"
+  },
+  {
+    "name": "PushBlockExStage",
+    "usedIn": "Push Block Platforming"
+  },
+  {
+    "name": "PoisonWaveExStage",
+    "usedIn": "Flying over the Posion Tide"
+  },
+  {
+    "name": "FrogSearchExStage",
+    "usedIn": "The Frog Pond"
+  },
+  {
+    "name": "WanwanClashExStage",
+    "usedIn": "Chain Chomp Shooting"
+  },
+  {
+    "name": "WindBlowExStage",
+    "usedIn": "The Gusty Bridges"
+  },
+  {
+    "name": "CapAppearExStage",
+    "usedIn": "The Mysterious Clouds"
+  },
+  {
+    "name": "TrexPoppunExStage",
+    "usedIn": "Dinosaur Nest"
+  },
+  {
+    "name": "SandWorldKillerExStage",
+    "usedIn": "Bullet Bill Maze"
+  },
+  {
+    "name": "SandWorldSphinxExStage",
+    "usedIn": "Jaxi Driver Course"
+  },
+  {
+    "name": "SandWorldMeganeExStage",
+    "usedIn": "Invisible Maze"
+  },
+  {
+    "name": "SandWorldRotateExStage",
+    "usedIn": "The Strange Neighborhood"
+  },
+  {
+    "name": "RocketFlowerExStage",
+    "usedIn": "Colossal Ruins"
+  },
+  {
+    "name": "MeganeLiftExStage",
+    "usedIn": "Transparent Platforms"
+  },
+  {
+    "name": "SandWorldPressExStage",
+    "usedIn": "Ice Cave"
+  },
+  {
+    "name": "SandWorldVibrationStage",
+    "usedIn": "Rumble"
+  },
+  {
+    "name": "WaterTubeExStage",
+    "usedIn": "Freezing Waterway"
+  },
+  {
+    "name": "TrampolineWallCatchExStage",
+    "usedIn": "Platforming Playground"
+  },
+  {
+    "name": "FastenerExStage",
+    "usedIn": "Zipper Chasm"
+  },
+  {
+    "name": "GotogotonExStage",
+    "usedIn": "Stone Block Puzzle Stage"
+  },
+  {
+    "name": "FrogPoisonExStage",
+    "usedIn": "Waves of Poison"
+  },
+  {
+    "name": "ForestWorldWaterExStage",
+    "usedIn": "Flooded Pipeway"
+  },
+  {
+    "name": "RailCollisionExStage",
+    "usedIn": "Flower Road"
+  },
+  {
+    "name": "ShootingElevatorExStage",
+    "usedIn": "Tank Elevator"
+  },
+  {
+    "name": "FogMountainExStage",
+    "usedIn": "In The Fog"
+  },
+  {
+    "name": "ForestWorldBonusStage",
+    "usedIn": "Forest Kingdom Bonus Stage"
+  },
+  {
+    "name": "PackunPoisonExStage",
+    "usedIn": "Invisible Road"
+  },
+  {
+    "name": "KillerRoadExStage",
+    "usedIn": "Breakdown Road"
+  },
+  {
+    "name": "ForestWorldCloudBonusExStage",
+    "usedIn": "The Clouds"
+  },
+  {
+    "name": "AnimalChaseExStage",
+    "usedIn": "Herding Sheep Bridge"
+  },
+  {
+    "name": "ForestWorldWoodsStage",
+    "usedIn": "Deep Woods"
+  },
+  {
+    "name": "FukuwaraiKuriboStage",
+    "usedIn": "Goomba Picture Match"
+  },
+  {
+    "name": "ImomuPoisonExStage",
+    "usedIn": "Poison Swamp"
+  },
+  {
+    "name": "JangoExStage",
+    "usedIn": "Klepto's Hot Nest"
+  },
+  {
+    "name": "ElectricWireExStage",
+    "usedIn": "Wire Station"
+  },
+  {
+    "name": "CapRotatePackunExStage",
+    "usedIn": "Rotating Maze"
+  },
+  {
+    "name": "TrexBikeExStage",
+    "usedIn": "Escape!"
+  },
+  {
+    "name": "SwingSteelExStage",
+    "usedIn": "Swinging Scaffolding"
+  },
+  {
+    "name": "DonsukeExStage",
+    "usedIn": "Pitch-Black Island"
+  },
+  {
+    "name": "CityPeopleRoadStage",
+    "usedIn": "The Crowd"
+  },
+  {
+    "name": "PoleKillerExStage",
+    "usedIn": "Pole Challenge"
+  },
+  {
+    "name": "PoleGrabCeilExStage",
+    "usedIn": "High Rise"
+  },
+  {
+    "name": "ShootingCityExStage",
+    "usedIn": "Under Siege"
+  },
+  {
+    "name": "BikeSteelExStage",
+    "usedIn": "Motor Scooter Stuntdriving"
+  },
+  {
+    "name": "IceWaterDashExStage",
+    "usedIn": "Cold Water Track"
+  },
+  {
+    "name": "IceWaterBlockExStage",
+    "usedIn": "Freezing Water Platforming"
+  },
+  {
+    "name": "ByugoPuzzleExStage",
+    "usedIn": "Ty-Foo Challenge"
+  },
+  {
+    "name": "IceWalkerExStage",
+    "usedIn": "Tracewalking"
+  },
+  {
+    "name": "SnowWorldCloudBonusStage",
+    "usedIn": "High-Altitude Flowers"
+  },
+  {
+    "name": "KillerRailCollisionExStage",
+    "usedIn": "Flower Road"
+  },
+  {
+    "name": "SnowWorldLobbyExStage",
+    "usedIn": "Iceburn Circuit"
+  },
+  {
+    "name": "WaterValleyExStage",
+    "usedIn": "Narrow Valley"
+  },
+  {
+    "name": "CloudExStage",
+    "usedIn": "Cloud Sea"
+  },
+  {
+    "name": "TogezoRotateExStage",
+    "usedIn": "Spinning Maze"
+  },
+  {
+    "name": "SenobiTowerExStage",
+    "usedIn": "Sinking Lava Island"
+  },
+  {
+    "name": "ReflectBombExStage",
+    "usedIn": "Bomb Valley"
+  },
+  {
+    "name": "SeaWorldUtsuboCaveStage",
+    "usedIn": "Sea Cave"
+  },
+  {
+    "name": "SeaWorldSneakingManStage",
+    "usedIn": "Sandy Bottom"
+  },
+  {
+    "name": "SeaWorldVibrationStage",
+    "usedIn": "Rumble Room"
+  },
+  {
+    "name": "ForkExStage",
+    "usedIn": "Fork Flickin"
+  },
+  {
+    "name": "CapAppearLavaLiftExStage",
+    "usedIn": "Volcano Cave"
+  },
+  {
+    "name": "GabuzouClockExStage",
+    "usedIn": "Gear Steps"
+  },
+  {
+    "name": "LavaWorldBubbleLaneExStage",
+    "usedIn": "Narrow Magma Path"
+  },
+  {
+    "name": "LavaWorldExcavationExStage",
+    "usedIn": "Cheese Rocks"
+  },
+  {
+    "name": "LavaWorldUpDownExStage",
+    "usedIn": "Magma Swamp"
+  },
+  {
+    "name": "LavaWorldClockExStage",
+    "usedIn": "Spinning Athletics"
+  },
+  {
+    "name": "LavaWorldFenceLiftExStage",
+    "usedIn": "lava Islands"
+  },
+  {
+    "name": "LavaWorldTreasureStage",
+    "usedIn": "Lucheon Kingdom Bonus"
+  },
+  {
+    "name": "LavaBonus1Zone",
+    "usedIn": "Slots"
+  },
+  {
+    "name": "BullRunExStage",
+    "usedIn": "Mummy Army"
+  },
+  {
+    "name": "DotTowerExStage",
+    "usedIn": "Roullete Tower"
+  },
+  {
+    "name": "JizoSwitchExStage",
+    "usedIn": "Jizo's Big Adventure"
+  },
+  {
+    "name": "TsukkunRotateExStage",
+    "usedIn": "Spinning Tower"
+  },
+  {
+    "name": "TsukkunClimbExStage",
+    "usedIn": "Wooden Tower"
+  },
+  {
+    "name": "SkyWorldCloudBonusExStage",
+    "usedIn": "Cloud Dash Track"
+  },
+  {
+    "name": "SkyWorldTreasureStage",
+    "usedIn": "Bowsers Bonus Stage"
+  },
+  {
+    "name": "MoonAthleticExStage",
+    "usedIn": "Giant Swings"
+  },
+  {
+    "name": "MoonWorldSpinxRoom",
+    "usedIn": "Sphynx Treasure Room"
+  },
+  {
+    "name": "YoshiCloudExStage",
+    "usedIn": "Sea of Clouds"
+  },
+  {
+    "name": "DotHardExStage",
+    "usedIn": "2D Moving Wall"
+  },
+  {
+    "name": "FukuwaraiMarioStage",
+    "usedIn": "Mario Picture Match"
+  },
+  {
+    "name": "PeachWorldCastleStage",
+    "usedIn": "Peach's Castle Interior"
+  },
+  {
+    "name": "PeachWorldPictureBossForestStage",
+    "usedIn": "Torkdrift Rematch Tower"
+  },
+  {
+    "name": "PeachWorldPictureBossKnuckleStage",
+    "usedIn": "Knucklotetc Rematch Tower"
+  },
+  {
+    "name": "PeachWorldPictureBossMagmaStage",
+    "usedIn": "Cookatiel Rematch Tower"
+  },
+  {
+    "name": "PeachWorldPictureMofumofuStage",
+    "usedIn": "Mechawiggler Rematch Tower"
+  },
+  {
+    "name": "PeachWorldPictureBossRaidStage",
+    "usedIn": "Lord of Lightning Rematch Tower"
+  },
+  {
+    "name": "PeachWorldPictureGiantWanderBossStage",
+    "usedIn": "Mollusque-Lanceur Rematch Tower"
+  },
+  {
+    "name": "Special1WorldTowerStackerStage",
+    "usedIn": "Darkside Topper Rematch"
+  },
+  {
+    "name": "Special1WorldTowerBombTailStage",
+    "usedIn": "Darkside Harriet Rematch"
+  },
+  {
+    "name": "Special1WorldTowerFireBlowerStage",
+    "usedIn": "Darkside Spewert Rematch"
+  },
+  {
+    "name": "Special1WorldTowerCapThrowerStage",
+    "usedIn": "Darkside Rango Rematch"
+  },
+  {
+    "name": "BikeSteelNoCapExStage",
+    "usedIn": "Revisiting Vanishing Road"
+  },
+  {
+    "name": "PackunPoisonNoCapExStage",
+    "usedIn": "Revisiting Invisible Road"
+  },
+  {
+    "name": "KillerRoadNoCapExStage",
+    "usedIn": "Revisiting Breakdown Road"
+  },
+  {
+    "name": "ShootingCityYoshiExStage",
+    "usedIn": "Yoshi Under Siege"
+  },
+  {
+    "name": "SenobiTowerYoshiExStage",
+    "usedIn": "Yoshi Sinking Island"
+  },
+  {
+    "name": "LavaWorldUpDownYoshiExStage",
+    "usedIn": "Yoshi Magma Swamp"
+  },
+  {
+    "name": "Special2WorldLavaStage",
+    "usedIn": "Inside Culmina Crater"
+  },
+  {
+    "name": "ForestWorldWoodsTreasureStage",
+    "usedIn": "Deep Woods Costume"
+  },
+  {
+    "name": "KaronWingTowerStage",
+    "usedIn": "Hexagon Tower"
+  },
+  {
+    "name": "CityWorldFactoryStage",
+    "usedIn": "Sewers"
+  },
+  {
+    "name": "ForestWorldBossStage",
+    "usedIn": "Secret Flower Field"
+  },
+  {
+    "name": "ForestWorldTowerStage",
+    "usedIn": "Wooded Tower"
+  },
+  {
+    "name": "MoonWorldCaptureParadeStage",
+    "usedIn": "Moon Cave"
+  },
+  {
+    "name": "MoonWorldWeddingRoomStage",
+    "usedIn": "Inside Chapel"
+  },
+  {
+    "name": "RevengeForestBossStage",
+    "usedIn": "Torkdrift Rematch"
+  },
+  {
+    "name": "RevengeBossKnuckleStage",
+    "usedIn": "Knucklotetc Rematch"
+  },
+  {
+    "name": "RevengeBossMagmaStage",
+    "usedIn": "Cookatiel Rematch"
+  },
+  {
+    "name": "RevengeBossRaidStage",
+    "usedIn": "Lord of Lightning Rematch"
+  },
+  {
+    "name": "RevengeGiantWanderBossStage",
+    "usedIn": "Mollusque-Lanceur Rematch"
+  },
+  {
+    "name": "RevengeMofumofuStage",
+    "usedIn": "Mechawiggler Rematch"
+  },
+  {
+    "name": "SandWorldPyramid000Stage",
+    "usedIn": "Inverted Pyramid Lower"
+  },
+  {
+    "name": "SandWorldPyramid001Stage",
+    "usedIn": "Inverted Pyramid Higher"
+  },
+  {
+    "name": "SandWorldUnderground000Stage",
+    "usedIn": "underground temple"
+  },
+  {
+    "name": "SandWorldUnderground001Stage",
+    "usedIn": "deepest underground"
+  },
+  {
+    "name": "SnowWorldTownStage",
+    "usedIn": "Shiveria"
+  },
+  {
+    "name": "SnowWorldLobby000Stage",
+    "usedIn": "Snow Lobby"
+  },
+  {
+    "name": "Special2WorldCloudStage",
+    "usedIn": "Darker Cloudy Chasm Lifts"
+  },
+  {
+    "name": "Special2WorldKoopaStage",
+    "usedIn": "Bowser Breakdown Escape"
+  }
+]
