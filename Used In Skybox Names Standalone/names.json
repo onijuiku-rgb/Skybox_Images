@@ -1,0 +1,546 @@
+[
+  {
+    "name": "CapWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "WaterFallWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LakeWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CloudWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ClashWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CityWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SnowWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SeaWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "BossRaidWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SkyWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "MoonWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special1WorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special2WorldHomeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PushBlockExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PoisonWaveExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "FrogSearchExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "WanwanClashExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "WindBlowExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CapAppearExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "TrexPoppunExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldKillerExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldSphinxExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldMeganeExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldRotateExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RocketFlowerExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "MeganeLiftExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldPressExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldVibrationStage",
+    "usedIn": ""
+  },
+  {
+    "name": "WaterTubeExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "TrampolineWallCatchExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "FastenerExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "GotogotonExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "FrogPoisonExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldWaterExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RailCollisionExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ShootingElevatorExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "FogMountainExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldBonusStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PackunPoisonExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "KillerRoadExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldCloudBonusExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "AnimalChaseExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldWoodsStage",
+    "usedIn": ""
+  },
+  {
+    "name": "FukuwaraiKuriboStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ImomuPoisonExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "JangoExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ElectricWireExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CapRotatePackunExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "TrexBikeExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SwingSteelExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "DonsukeExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CityPeopleRoadStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PoleKillerExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PoleGrabCeilExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ShootingCityExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "BikeSteelExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "IceWaterDashExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "IceWaterBlockExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ByugoPuzzleExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "IceWalkerExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SnowWorldCloudBonusStage",
+    "usedIn": ""
+  },
+  {
+    "name": "KillerRailCollisionExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SnowWorldLobbyExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "WaterValleyExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CloudExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "TogezoRotateExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SenobiTowerExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ReflectBombExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SeaWorldUtsuboCaveStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SeaWorldSneakingManStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SeaWorldVibrationStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForkExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CapAppearLavaLiftExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "GabuzouClockExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldBubbleLaneExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldExcavationExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldUpDownExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldClockExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldFenceLiftExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldTreasureStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaBonus1Stage",
+    "usedIn": ""
+  },
+  {
+    "name": "BullRunExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "DotTowerExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "JizoSwitchExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "TsukkunRotateExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "TsukkunClimbExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SkyWorldCloudBonusExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SkyWorldTreasureStage",
+    "usedIn": ""
+  },
+  {
+    "name": "MoonAthleticExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "MoonWorldSpinxRoom",
+    "usedIn": ""
+  },
+  {
+    "name": "YoshiCloudExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "DotHardExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "FukuwaraiMarioStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldCastleStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldPictureBossForestStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldPictureBossKnuckleStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldPictureBossMagmaStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldPictureMofumofuStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldPictureBossRaidStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PeachWorldPictureGiantWanderBossStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special1WorldTowerStackerStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special1WorldTowerBombTailStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special1WorldTowerFireBlowerStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special1WorldTowerCapThrowerStage",
+    "usedIn": ""
+  },
+  {
+    "name": "BikeSteelNoCapExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "PackunPoisonNoCapExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "KillerRoadNoCapExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ShootingCityYoshiExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SenobiTowerYoshiExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "LavaWorldUpDownYoshiExStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special2WorldLavaStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldWoodsTreasureStage",
+    "usedIn": ""
+  },
+  {
+    "name": "KaronWingTowerStage",
+    "usedIn": ""
+  },
+  {
+    "name": "CityWorldFactoryStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldBossStage",
+    "usedIn": ""
+  },
+  {
+    "name": "ForestWorldTowerStage",
+    "usedIn": ""
+  },
+  {
+    "name": "MoonWorldCaptureParadeStage",
+    "usedIn": ""
+  },
+  {
+    "name": "MoonWorldWeddingRoomStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RevengeForestBossStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RevengeBossKnuckleStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RevengeBossMagmaStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RevengeBossRaidStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RevengeGiantWanderBossStage",
+    "usedIn": ""
+  },
+  {
+    "name": "RevengeMofumofuStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldPyramid000Stage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldPyramid001Stage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldUnderground000Stage",
+    "usedIn": ""
+  },
+  {
+    "name": "SandWorldUnderground001Stage",
+    "usedIn": ""
+  },
+  {
+    "name": "SnowWorldTownStage",
+    "usedIn": ""
+  },
+  {
+    "name": "SnowWorldLobby000Stage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special2WorldCloudStage",
+    "usedIn": ""
+  },
+  {
+    "name": "Special2WorldKoopaStage",
+    "usedIn": ""
+  }
+]

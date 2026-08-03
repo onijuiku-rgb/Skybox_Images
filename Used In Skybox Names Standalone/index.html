@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Mario Odyssey - Skybox Names</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background-color: #121212;
+    color: #e6e6e6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  header h1 {
+    margin: 0 0 4px;
+    font-size: 1.4rem;
+  }
+
+  header p {
+    margin: 0;
+    color: #999;
+    font-size: 13px;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 16px 24px;
+    flex-wrap: wrap;
+  }
+
+  #searchInput {
+    background-color: #1a1a1a;
+    border: 1px solid #3d3d3d;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    min-width: 240px;
+    flex: 1;
+    max-width: 360px;
+  }
+
+  #searchInput:focus { border-color: #189844; }
+
+  #resultCount {
+    color: #888;
+    font-size: 12px;
+  }
+
+  .names-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 8px 24px 32px;
+  }
+
+  .names-card {
+    background-color: rgba(30, 31, 34, 0.9);
+    border: 1px solid #3f4147;
+    border-radius: 8px;
+    padding: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    min-width: 0;
+  }
+
+  .names-card-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #ffffff;
+    background-color: #2b2d31;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: block;
+    margin-bottom: 10px;
+    border-left: 4px solid #5865F2;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .names-card-body {
+    background-color: #2b2d31;
+    border: 1px solid #3f4147;
+    border-radius: 4px;
+    padding: 8px 10px;
+  }
+
+  .names-card-body label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #888;
+    margin-bottom: 4px;
+  }
+
+  .names-card-body .used-in-value {
+    font-size: 12px;
+    color: #dbdee1;
+    min-height: 16px;
+  }
+
+  .names-card-body .used-in-value.empty {
+    color: #666;
+    font-style: italic;
+  }
+
+  #emptyState {
+    text-align: center;
+    color: #777;
+    padding: 60px 20px;
+    display: none;
+  }
+
+  footer {
+    padding: 20px 24px 40px;
+    color: #666;
+    font-size: 12px;
+    border-top: 1px solid #2a2a2a;
+  }
+
+  footer a { color: #8ab4f8; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Super Mario Odyssey - Skybox Names</h1>
+  <p>Community reference for skybox stage names and where each one is used in-game.</p>
+</header>
+
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="Search skybox name or location...">
+  <span id="resultCount"></span>
+</div>
+
+<div class="names-card-grid" id="namesGrid"></div>
+<div id="emptyState">No matches found.</div>
+
+<footer>
+  Data sourced from <code>names.json</code> in this repository. Spotted something wrong or missing? Open a pull request or an issue on
+  <a href="#" id="repoLink">GitHub</a>.
+</footer>
+
+<script>
+  let allNames = [];
+
+  async function loadNames() {
+    const res = await fetch('names.json');
+    allNames = await res.json();
+    renderGrid(allNames);
+  }
+
+  function renderGrid(list) {
+    const grid = document.getElementById('namesGrid');
+    const emptyState = document.getElementById('emptyState');
+    const resultCount = document.getElementById('resultCount');
+    grid.innerHTML = '';
+
+    resultCount.textContent = `${list.length} / ${allNames.length} shown`;
+
+    if (list.length === 0) {
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+
+    list.forEach(entry => {
+      const card = document.createElement('div');
+      card.className = 'names-card';
+
+      const title = document.createElement('div');
+      title.className = 'names-card-title';
+      title.textContent = entry.name;
+      card.appendChild(title);
+
+      const body = document.createElement('div');
+      body.className = 'names-card-body';
+
+      const label = document.createElement('label');
+      label.textContent = 'Used In';
+      body.appendChild(label);
+
+      const value = document.createElement('div');
+      value.className = 'used-in-value';
+      const usedIn = (entry.usedIn || '').trim();
+      if (usedIn === '') {
+        value.classList.add('empty');
+        value.textContent = 'Not documented yet';
+      } else {
+        value.textContent = usedIn;
+      }
+      body.appendChild(value);
+
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+  }
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    if (q === '') {
+      renderGrid(allNames);
+      return;
+    }
+    const filtered = allNames.filter(entry =>
+      entry.name.toLowerCase().includes(q) ||
+      (entry.usedIn || '').toLowerCase().includes(q)
+    );
+    renderGrid(filtered);
+  });
+
+  loadNames();
+</script>
+
+</body>
+</html>
