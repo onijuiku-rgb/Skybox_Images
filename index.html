@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Mario Odyssey Skybox Project</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: #121212;
+    color: #e6e6e6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  p.subtitle {
+    color: #999;
+    margin: 0 0 40px;
+    text-align: center;
+    max-width: 480px;
+    font-size: 14px;
+  }
+
+  .link-grid {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .link-card {
+    display: block;
+    background-color: rgba(30, 31, 34, 0.9);
+    border: 1px solid #3f4147;
+    border-radius: 8px;
+    padding: 18px 20px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    transition: border-color 0.15s ease;
+  }
+
+  .link-card:hover {
+    border-color: #5865F2;
+  }
+
+  .link-card .card-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #ffffff;
+    margin-bottom: 4px;
+    border-left: 4px solid #5865F2;
+    padding-left: 10px;
+  }
+
+  .link-card .card-desc {
+    font-size: 12px;
+    color: #999;
+    padding-left: 14px;
+  }
+
+  .link-card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  footer {
+    margin-top: 60px;
+    color: #555;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  footer a { color: #8ab4f8; }
+</style>
+</head>
+<body>
+
+<h1>Super Mario Odyssey Skybox Project</h1>
+<p class="subtitle">Community reference material from ongoing skybox testing and documentation.</p>
+
+<div class="link-grid">
+  <a class="link-card" href="names/">
+    <div class="card-title">Skybox Names</div>
+    <div class="card-desc">All 136 internal skybox names and where each one is used in-game.</div>
+  </a>
+
+  <a class="link-card disabled" href="skybox/">
+    <div class="card-title">Skybox Gallery</div>
+    <div class="card-desc">Coming soon.</div>
+  </a>
+</div>
+
+<footer>
+  Images hosted from this repository via <a href="https://www.jsdelivr.com/" target="_blank" rel="noopener">jsDelivr</a>.
+</footer>
+
+</body>
+</html>
