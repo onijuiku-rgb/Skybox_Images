@@ -19,6 +19,18 @@
     border-bottom: 1px solid #2a2a2a;
   }
 
+  .back-link {
+    display: inline-block;
+    color: #8ab4f8;
+    text-decoration: none;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
   header h1 {
     margin: 0 0 4px;
     font-size: 1.4rem;
@@ -76,7 +88,7 @@
 
   .names-card-title {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 13px; /* starting size - shrinkTitlesToFit() JS below shrinks this per-card if a name is too long to fit on one line */
     color: #ffffff;
     background-color: #2b2d31;
     padding: 6px 12px;
@@ -84,8 +96,8 @@
     display: block;
     margin-bottom: 10px;
     border-left: 4px solid #5865F2;
-    overflow-wrap: break-word;
-    word-break: break-word;
+    white-space: nowrap; /* never wrap to a 2nd line - font shrinks to fit instead */
+    overflow: hidden;    /* safety net in case a name is too long even at minimum font size */
   }
 
   .names-card-body {
@@ -135,6 +147,7 @@
 <body>
 
 <header>
+  <a class="back-link" href="../">&larr; Back to Hub</a>
   <h1>Super Mario Odyssey - Skybox Names</h1>
   <p>Community reference for skybox stage names and where each one is used in-game.</p>
 </header>
@@ -204,6 +217,26 @@
 
       card.appendChild(body);
       grid.appendChild(card);
+    });
+
+    shrinkTitlesToFit();
+  }
+
+  // Auto-shrinks each title's font size until it fits on one line, so
+  // long camelCase names never wrap and never spill into the neighboring
+  // card. Runs after every render, including search/filter re-renders.
+  function shrinkTitlesToFit() {
+    const titles = document.querySelectorAll('.names-card-title');
+    const minFontSize = 9; // never shrink smaller than this, even for very long names
+
+    titles.forEach(title => {
+      let fontSize = 13; // starting size, matches the CSS default above
+      title.style.fontSize = fontSize + 'px';
+
+      while (title.scrollWidth > title.clientWidth && fontSize > minFontSize) {
+        fontSize -= 0.5;
+        title.style.fontSize = fontSize + 'px';
+      }
     });
   }
 
