@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skybox Patrol</title>
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    /* Dark-theme the OUTER page scrollbar too, in case that's the light
+       one showing up - not just the inner table's own scrollbar below. */
+    scrollbar-color: #3d3d3d #121212;
+    scrollbar-width: thin;
+  }
+
+  html::-webkit-scrollbar, body::-webkit-scrollbar { width: 12px; height: 12px; }
+  html::-webkit-scrollbar-track, body::-webkit-scrollbar-track { background: #121212; }
+  html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+    background-color: #3d3d3d;
+    border-radius: 6px;
+  }
+
+  body {
+    margin: 0;
+    background-color: #121212;
+    color: #e6e6e6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 24px;
+  }
+
+  h1 { font-size: 1.3rem; margin: 0 0 4px; }
+  p.subtitle { color: #999; margin: 0 0 16px; font-size: 13px; }
+
+  #statusLine {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 16px;
+    min-height: 16px;
+  }
+
+  #statusLine.connected { color: #17c964; }
+  #statusLine.error { color: #f87171; }
+
+  button {
+    background-color: #2b2d31;
+    color: #fff;
+    border: 1px solid #3f4147;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  button:hover { border-color: #5865F2; }
+
+  /* Fixed to the top-right corner of the viewport, so it stays put and
+     out of the way regardless of how tall the rest of the page gets. */
+  .auth-widget {
+    position: fixed;
+    top: 20px;
+    right: 260px; /* sits to the left of the progress widget, both pinned top-right */
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #signInBtn {
+    background-color: #1a1a1a;
+    border: 1px solid #3d3d3d;
+    color: #e6e6e6;
+  }
+
+  .auth-status {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .auth-status.editor {
+    background-color: #12351f;
+    color: #17c964;
+    border: 1px solid #17c964;
+  }
+
+  .auth-status.readonly {
+    background-color: #1a1a1a;
+    color: #999;
+    border: 1px solid #3d3d3d;
+  }
+
+  .progress-widget {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 100;
+  }
+
+  #allProgressBtn {
+    background-color: #1a1a1a;
+    border: 1px solid #3d3d3d;
+    color: #a3e6be;
+  }
+
+  .progress-list {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    width: 280px;
+    max-height: 70vh;
+    overflow-y: auto;
+    margin-top: 8px;
+    padding: 10px;
+    background-color: #17181a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+
+  .progress-list.open { display: flex; }
+
+  .progress-list::-webkit-scrollbar { width: 10px; }
+  .progress-list::-webkit-scrollbar-track { background: #1a1a1a; }
+  .progress-list::-webkit-scrollbar-thumb { background-color: #3d3d3d; border-radius: 5px; }
+
+  .progress-list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1a1a1a;
+    border: 1px solid #333333;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .progress-list-row .kingdom-name { color: #ddd; }
+  .progress-list-row .kingdom-pct { font-weight: 700; color: #fbe38e; }
+  .progress-list-row .kingdom-pct.complete { color: #17c964; }
+
+  .progress-list-row.total-row {
+    margin-top: 4px;
+    border-top: 2px solid #3d3d3d;
+    background-color: #14251c;
+  }
+
+  .progress-list-row.total-row .kingdom-name { color: #ffffff; font-weight: 700; }
+
+  /* ===================== KINGDOM TABS ===================== */
+  .tab-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .tab-btn {
+    background-color: #1e1f22;
+    color: #aaa;
+    border: 1px solid #333;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tab-btn:hover { border-color: #5865F2; }
+
+  .tab-btn.active {
+    background-color: #5865F2;
+    color: #fff;
+    border-color: #5865F2;
+  }
+
+  /* ===================== SKYBOX JUMP SEARCH ===================== */
+  .jump-search-input {
+    background-color: #1a1a1a;
+    border: 1px solid #3d3d3d;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    width: 280px;
+    margin-bottom: 12px;
+  }
+
+  .jump-search-input:focus { border-color: #189844; }
+
+  /* Briefly flashed onto a column's header + cells after jumping to it
+     via the search box, so it's obvious which one you landed on. */
+  .column-highlight {
+    background-color: #2a2a4a !important;
+    transition: background-color 1.5s ease;
+  }
+
+  /* ===================== MAIN STATUS TABLE ===================== */
+  .table-scroll-wrapper {
+    overflow-x: auto;
+    border: none;
+    padding: 4px 0 8px;
+    margin-bottom: 30px;
+  }
+
+  .table-scroll-wrapper::-webkit-scrollbar { height: 12px; }
+  .table-scroll-wrapper::-webkit-scrollbar-track { background: #1a1a1a; }
+  .table-scroll-wrapper::-webkit-scrollbar-thumb {
+    background-color: #3d3d3d;
+    border-radius: 6px;
+    border: 3px solid #1a1a1a;
+  }
+  .table-scroll-wrapper { scrollbar-color: #3d3d3d #1a1a1a; scrollbar-width: thin; }
+
+  /* Rows read as their own separated card (Notion/Linear database-view
+     style) rather than one continuous ruled spreadsheet grid - vertical
+     border-spacing does the row-separating instead of border lines, and
+     each row gets its own background so it reads as a distinct block. */
+  table {
+    border-collapse: separate; /* "separate" (not "collapse") is what lets border-radius/spacing work per-cell instead of one harsh uniform grid */
+    border-spacing: 0 8px;
+    width: max-content;
+  }
+
+  th, td {
+    padding: 13px 16px;
+    text-align: left;
+    font-size: 13px;
+    white-space: nowrap;
+    border-bottom: none;
+  }
+
+  th {
+    color: #a3e6be;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background-color: #121212;
+    padding-bottom: 10px;
+  }
+
+  tbody tr td {
+    background-color: #1c1d21;
+  }
+
+  tbody tr td:first-child { border-radius: 10px 0 0 10px; font-weight: 600; }
+  tbody tr td:last-child { border-radius: 0 10px 10px 0; }
+
+  /* A spreadsheet doesn't highlight rows on hover, a real app does - this
+     alone goes a long way toward not looking like Google Sheets. */
+  tbody tr:hover td {
+    background-color: #24262c;
+  }
+
+  /* Sticky first column needs its OWN background applied directly (not
+     inherited), since position:sticky elements paint above the row's own
+     background in some browsers - true for both the resting and hover state. */
+  th:first-child, td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+
+  th:first-child { background-color: #121212; }
+  td:first-child { background-color: #1c1d21; }
+  tbody tr:hover td:first-child { background-color: #24262c; }
+
+  select {
+    appearance: none;         /* removes the browser's native control chrome entirely - */
+    -webkit-appearance: none; /* this is what was causing the small white box on hover: */
+    -moz-appearance: none;    /* without this, the browser draws its own native arrow */
+    background-color: #2b2d31;/* button ON TOP of our custom pill styling. */
+    color: #fff;
+    border: 1px solid #3f4147;
+    border-radius: 7px;
+    padding: 4px 26px 4px 10px; /* extra right padding makes room for the custom arrow below */
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+
+    /* Hand-drawn dropdown arrow, since appearance:none removes the
+       native one entirely - this SVG is just a small down-chevron. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+  }
+
+  select:focus {
+    border-color: #5865F2; /* replaces the browser's default focus ring, which also looked out of place */
+  }
+
+  /* The status pill in each main-table cell is a <button> that opens our
+     own dropdown panel (below), not a native <select> - a browser's open
+     <select> list is OS-rendered chrome we can't restyle (the "Windows 7"
+     look), so this is the only way to keep the app's rounded dark theme
+     once the list is actually open. */
+  .status-trigger {
+    appearance: none;
+    border: none;
+    background-color: #2b2d31;
+    color: #fff;
+    border-radius: 7px;
+    padding: 4px 26px 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+  }
+
+  .status-trigger:hover { filter: brightness(1.08); }
+  .status-trigger:focus-visible { outline: 2px solid #5865F2; outline-offset: 1px; }
+
+  /* One color per status, spread around the hue wheel instead of the old
+     4-bucket good/bad/warn/neutral grouping - "Looks Bad" and "Lags
+     Kingdom" used to render as the same red, and all 3 "Good but X"
+     caveats used to render as the same yellow, which made them hard to
+     tell apart at a glance. */
+  .status-trigger.status-good, .status-pill-readonly.status-good { background-color: #15803d; }
+  .status-trigger.status-avoid, .status-pill-readonly.status-avoid { background-color: #c2410c; }
+  .status-trigger.status-lags, .status-pill-readonly.status-lags { background-color: #b91c1c; }
+  .status-trigger.status-dark, .status-pill-readonly.status-dark { background-color: #6d28d9; }
+  .status-trigger.status-bright, .status-pill-readonly.status-bright { background-color: #92720a; }
+  .status-trigger.status-foggy, .status-pill-readonly.status-foggy { background-color: #0e7490; }
+  .status-trigger.status-uncertain, .status-pill-readonly.status-uncertain { background-color: #e5e7eb; color: #18181b; }
+  /* Uncertain's pale background needs a dark dropdown arrow instead of
+     the shared white one, or it'd be invisible against it. */
+  .status-trigger.status-uncertain { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2318181b' stroke-width='2'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); }
+  .status-trigger.status-neutral, .status-pill-readonly.status-neutral { background-color: #2b2d31; }
+
+  /* Read-only version of the same pill, shown instead of a button to
+     anyone who isn't signed in as an approved editor. Same look, but a
+     plain span - nothing to click, nothing to change. */
+  .status-pill-readonly {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    cursor: default;
+  }
+
+  /* The custom dropdown panel a .status-trigger opens - one shared
+     element reused for whichever cell is active, positioned next to
+     that cell's trigger button. */
+  .status-dropdown-panel {
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 170px;
+    max-height: 280px;
+    overflow-y: auto;
+    background-color: #1c1d21;
+    border: 1px solid #2f3036;
+    border-radius: 10px;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.55);
+    padding: 6px;
+    z-index: 1000;
+  }
+
+  .status-dropdown-panel.open { display: flex; }
+
+  .status-dropdown-panel::-webkit-scrollbar { width: 8px; }
+  .status-dropdown-panel::-webkit-scrollbar-track { background: #1a1a1a; }
+  .status-dropdown-panel::-webkit-scrollbar-thumb { background-color: #3d3d3d; border-radius: 4px; }
+
+  .status-dropdown-option {
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .status-dropdown-option:hover { filter: brightness(1.15); }
+  .status-dropdown-option.selected { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.65); }
+
+  /* ===================== SUMMARY / ISSUES SECTION ===================== */
+  .summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .summary-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #fbe38e;
+  }
+
+  .progress-badge {
+    background-color: #1a1a1a;
+    border: 1px solid #3d3d3d;
+    color: #a3e6be;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .progress-badge.complete { color: #17c964; border-color: #17c964; }
+
+  .summary-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .summary-search-input, .summary-select-filter {
+    background-color: #1a1a1a;
+    border: 1px solid #3d3d3d;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+  }
+
+  .summary-search-input:focus, .summary-select-filter:focus { border-color: #189844; }
+
+  /* Filter checkboxes - toggled open/closed via the "Filters" button */
+  #filterPanel {
+    display: none;
+    flex-wrap: wrap;
+    gap: 14px;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+
+  #filterPanel.open { display: flex; }
+
+  #filterPanel label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ccc;
+    cursor: pointer;
+  }
+
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* without this, the unbroken camelCase skybox
+      names below force the table wider than its container - fixed
+      layout + word-break on the cells (below) lets them wrap instead. */
+  }
+
+  .summary-table th {
+    text-align: left;
+    font-size: 12px;
+    color: #999;
+    white-space: normal;
+    overflow-wrap: break-word;
+    border-bottom: 1px solid #2a2a2a;
+    padding: 8px 10px;
+    background: none;
+  }
+
+  .summary-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #222;
+    font-size: 13px;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .summary-table th:nth-child(1), .summary-table td:nth-child(1) { width: 28%; }
+  .summary-table th:nth-child(2), .summary-table td:nth-child(2) { width: 40%; }
+  .summary-table th:nth-child(3), .summary-table td:nth-child(3) { width: 32%; }
+
+  .summary-table .status-text-good { color: #4ade80; font-weight: 600; }
+  .summary-table .status-text-avoid { color: #fb923c; font-weight: 600; }
+  .summary-table .status-text-lags { color: #f87171; font-weight: 600; }
+  .summary-table .status-text-dark { color: #c4b5fd; font-weight: 600; }
+  .summary-table .status-text-bright { color: #fbe38e; font-weight: 600; }
+  .summary-table .status-text-foggy { color: #67e8f9; font-weight: 600; }
+  .summary-table .status-text-uncertain { color: #f4f4f5; font-weight: 700; }
+  .summary-table .status-text-neutral { color: #999; font-style: italic; }
+
+  #emptySummary {
+    color: #777;
+    font-size: 13px;
+    padding: 16px 0;
+    display: none;
+  }
+
+  .mobile-scroll-hint { display: none; }
+
+  /* ===================== MOBILE / NARROW VIEWPORTS =====================
+     Below this width the .auth-widget and .progress-widget give up their
+     fixed top-right pinning (which was overlapping the h1/subtitle on
+     phones) and drop into normal document flow instead, stacked above
+     the title. Touch targets also grow here - the desktop sizes (30-34px)
+     are fine for a mouse pointer but too small to reliably tap. */
+  @media (max-width: 700px) {
+    body { padding: 16px; }
+
+    h1 { font-size: 1.15rem; }
+    p.subtitle { font-size: 12px; }
+
+    .auth-widget {
+      position: static;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    .auth-status {
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .progress-widget {
+      position: static;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    #allProgressBtn { width: 100%; }
+
+    .progress-list, .progress-list.open {
+      width: 100%;
+      max-width: none;
+    }
+
+    .jump-search-input {
+      width: 100%;
+      max-width: none;
+    }
+
+    /* Bigger tap targets across the board - default button/select sizing
+       is comfortable for a mouse but too cramped for a thumb. */
+    button, .tab-btn { min-height: 42px; padding: 10px 16px; }
+    select { min-height: 36px; padding-top: 8px; padding-bottom: 8px; }
+    /* .status-trigger is a <button>, so it already gets the 42px touch
+       target from the generic button rule above - no override needed. */
+    button, select, input, .tab-btn { touch-action: manipulation; }
+
+    .tab-bar { gap: 8px; margin-bottom: 10px; }
+
+    /* The main status table stays a horizontally-scrollable grid on
+       mobile (matching the spreadsheet-like data it holds - a card
+       view of 136 skybox columns per subarea would be far longer to
+       scroll than swiping sideways through a frozen-first-column grid,
+       same pattern Sheets itself uses on mobile). Momentum scrolling +
+       an explicit hint make that swipe discoverable and pleasant. */
+    .table-scroll-wrapper { -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
+    table { border-spacing: 0 6px; }
+    th, td { padding: 8px 10px; font-size: 12.5px; }
+
+    .mobile-scroll-hint {
+      display: block;
+      font-size: 11px;
+      color: #777;
+      margin: 0 0 6px;
+    }
+
+    /* Summary controls stack to full-width rows instead of cramming
+       inline - inline wrapping left the search box awkwardly narrow. */
+    .summary-header { gap: 10px; }
+    .summary-controls { width: 100%; }
+    .summary-controls > * { flex: 1 1 100%; }
+
+    .summary-table th, .summary-table td { padding: 10px 8px; font-size: 12.5px; }
+
+    #filterPanel label { min-height: 28px; }
+  }
+
+  @media (max-width: 400px) {
+    h1 { font-size: 1.05rem; }
+    th, td { padding: 7px 8px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="auth-widget" id="authWidget">
+  <button id="signInBtn">Sign in with Google</button>
+</div>
+
+<h1>Skybox Patrol</h1>
+<p class="subtitle">Checking every skybox in every loading zone, across all 17 Kingdoms, for lag and visual issues.</p>
+
+<div id="statusLine">Loading Kingdom list...</div>
+
+
+<div class="progress-widget">
+  <button id="allProgressBtn">All Kingdoms Progress</button>
+  <div class="progress-list" id="allProgressList"></div>
+</div>
+
+<div class="tab-bar" id="tabBar"></div>
+
+<div>
+  <input type="text" class="jump-search-input" id="skyboxJumpInput" list="skyboxDatalist" placeholder="Jump to skybox column...">
+  <datalist id="skyboxDatalist"></datalist>
+</div>
+
+<p class="mobile-scroll-hint">Swipe sideways to see all skyboxes &rarr;</p>
+<div class="table-scroll-wrapper">
+  <table id="mainTable">
+    <thead id="mainTableHead"></thead>
+    <tbody id="mainTableBody"></tbody>
+  </table>
+</div>
+
+<div class="summary-header">
+  <h2>&#9888; Issues &amp; Actionable Skyboxes (<span id="activeKingdomName">-</span>)</h2>
+  <div class="progress-badge" id="progressBadge"></div>
+  <div class="summary-controls">
+    <button id="toggleFiltersBtn">Filters</button>
+    <select class="summary-select-filter" id="subareaFilterSelect">
+      <option value="">All Subareas</option>
+    </select>
+    <input type="text" class="summary-search-input" id="searchInput" placeholder="Search subarea or skybox...">
+  </div>
+</div>
+
+<div id="filterPanel"></div>
+
+<table class="summary-table">
+  <thead>
+    <tr><th>Loading Zone (Subarea)</th><th>Skybox</th><th>Status / Action</th></tr>
+  </thead>
+  <tbody id="summaryTableBody"></tbody>
+</table>
+<div id="emptySummary">Nothing matches the current filters.</div>
+
+<script type="module">
+  // ===================== FIREBASE SETUP =====================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAzJhU7wI1iFPEExIgCD-DpZ8sKljtH7Yk",
+    authDomain: "smo-skybox-testing.firebaseapp.com",
+    projectId: "smo-skybox-testing",
+    storageBucket: "smo-skybox-testing.firebasestorage.app",
+    messagingSenderId: "604114241784",
+    appId: "1:604114241784:web:591528df76f683a843530d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  // ===================== STATUS OPTIONS =====================
+  // Same set/meanings as the Apps Script version's dropdown pills.
+  const STATUS_OPTIONS = [
+    "",
+    "Good to Use",
+    "Looks Bad - Don't Use",
+    "Lags Kingdom",
+    "Good but Dark",
+    "Good but Bright",
+    "Good but Foggy",
+    "Uncertain"
+  ];
+
+  // Each status gets its own class/color (not grouped into good/bad/warn
+  // buckets) so e.g. "Looks Bad" and "Lags Kingdom" - or the three
+  // "Good but X" caveats - don't render as the same shade as each other.
+  function statusClass(value) {
+    if (value === "Good to Use") return "status-good";
+    if (value === "Looks Bad - Don't Use") return "status-avoid";
+    if (value === "Lags Kingdom") return "status-lags";
+    if (value === "Good but Dark") return "status-dark";
+    if (value === "Good but Bright") return "status-bright";
+    if (value === "Good but Foggy") return "status-foggy";
+    if (value === "Uncertain") return "status-uncertain";
+    return "status-neutral";
+  }
+
+  // Same palette as the select.status-* / .status-pill-readonly.status-*
+  // CSS rules, kept here as inline styles because <option> background
+  // colors don't reliably respond to CSS classes across browsers - this
+  // colors each OPTION inside the open dropdown list to match its closed-
+  // pill color.
+  function optionColor(value) {
+    const colors = {
+      "": "#2b2d31",
+      "Good to Use": "#15803d",
+      "Looks Bad - Don't Use": "#c2410c",
+      "Lags Kingdom": "#b91c1c",
+      "Good but Dark": "#6d28d9",
+      "Good but Bright": "#92720a",
+      "Good but Foggy": "#0e7490",
+      "Uncertain": "#e5e7eb"
+    };
+    return colors[value] || "#2b2d31";
+  }
+
+  // Uncertain's option background is near-white, so it needs dark text -
+  // every other status keeps the white text the dropdown otherwise uses.
+  function optionTextColor(value) {
+    return value === "Uncertain" ? "#18181b" : "#ffffff";
+  }
+
+  // ===================== CUSTOM STATUS DROPDOWN =====================
+  // One shared popup element, repositioned next to whichever cell's
+  // .status-trigger button was clicked, instead of a <select> per cell -
+  // this is what lets the OPEN list match the app's rounded dark theme
+  // rather than falling back to the browser/OS's native list chrome.
+  let dropdownPanel = null;
+  let activeDropdownTrigger = null;
+
+  function getDropdownPanel() {
+    if (dropdownPanel) return dropdownPanel;
+    dropdownPanel = document.createElement('div');
+    dropdownPanel.className = 'status-dropdown-panel';
+    document.body.appendChild(dropdownPanel);
+    return dropdownPanel;
+  }
+
+  function closeStatusDropdown() {
+    if (!dropdownPanel) return;
+    dropdownPanel.classList.remove('open');
+    activeDropdownTrigger = null;
+  }
+
+  function openStatusDropdown(trigger, currentValue, onSelect) {
+    const panel = getDropdownPanel();
+
+    // Clicking the already-open trigger again just closes it.
+    if (activeDropdownTrigger === trigger) {
+      closeStatusDropdown();
+      return;
+    }
+
+    panel.innerHTML = '';
+    STATUS_OPTIONS.forEach(opt => {
+      const row = document.createElement('div');
+      row.className = 'status-dropdown-option' + (opt === currentValue ? ' selected' : '');
+      row.textContent = opt === "" ? "-- Select --" : opt;
+      row.style.backgroundColor = optionColor(opt);
+      row.style.color = optionTextColor(opt);
+      row.addEventListener('click', () => {
+        closeStatusDropdown();
+        onSelect(opt);
+      });
+      panel.appendChild(row);
+    });
+
+    const rect = trigger.getBoundingClientRect();
+    panel.style.minWidth = Math.max(170, Math.round(rect.width)) + 'px';
+    panel.style.left = Math.round(rect.left) + 'px';
+    panel.style.top = Math.round(rect.bottom + 6) + 'px';
+    panel.classList.add('open');
+    activeDropdownTrigger = trigger;
+
+    // Flip upward instead of running off the bottom of the viewport.
+    const panelHeight = panel.offsetHeight;
+    if (rect.bottom + 6 + panelHeight > window.innerHeight) {
+      panel.style.top = Math.max(6, Math.round(rect.top - panelHeight - 6)) + 'px';
+    }
+  }
+
+  // Outside click / Escape / scroll all close the panel - a stale
+  // position (e.g. after scrolling the table sideways) would otherwise
+  // point at the wrong cell.
+  document.addEventListener('click', (e) => {
+    if (!dropdownPanel || !dropdownPanel.classList.contains('open')) return;
+    if (dropdownPanel.contains(e.target)) return;
+    if (activeDropdownTrigger && activeDropdownTrigger.contains(e.target)) return;
+    closeStatusDropdown();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeStatusDropdown();
+  });
+  window.addEventListener('scroll', closeStatusDropdown, true);
+  window.addEventListener('resize', closeStatusDropdown);
+
+  function statusTextClass(value) {
+    if (value === "Good to Use") return "status-text-good";
+    if (value === "Looks Bad - Don't Use") return "status-text-avoid";
+    if (value === "Lags Kingdom") return "status-text-lags";
+    if (value === "Good but Dark") return "status-text-dark";
+    if (value === "Good but Bright") return "status-text-bright";
+    if (value === "Good but Foggy") return "status-text-foggy";
+    if (value === "Uncertain") return "status-text-uncertain";
+    return "status-text-neutral";
+  }
+
+  // ===================== GLOBAL STATE =====================
+  let KINGDOMS = [];   // [{ slug, label, subareas: [...] }, ...] - loaded from kingdoms-config.json
+  let currentUser = null; // the signed-in Firebase Auth user object, or null if signed out
+  let isEditor = false;   // true only if currentUser's email exists in the authorizedEditors collection
+  let SKYBOXES = [];   // shared 136-name list, same order for every Kingdom
+  let activeSlug = null;
+  let activeLabel = '';
+  let activeSubareas = [];
+  let currentData = {};        // { subareaName: { skyboxName: status } } for the CURRENTLY ACTIVE kingdom only
+  let unsubscribeSnapshot = null; // stops the previous Kingdom's live listener when switching tabs
+
+  // Filters (shared across all Kingdoms, not reset when switching tabs)
+  let hiddenStatuses = new Set(["Good to Use"]); // "Good to Use" hidden by default - the summary table is meant to highlight problems, not everything
+  let subareaFilter = "";
+  let searchQuery = "";
+
+  // ===================== AUTH: SIGN IN / OUT / ALLOWLIST CHECK =====================
+
+  function renderAuthWidget() {
+    const widget = document.getElementById('authWidget');
+    widget.innerHTML = '';
+
+    if (!currentUser) {
+      const btn = document.createElement('button');
+      btn.id = 'signInBtn';
+      btn.textContent = 'Sign in with Google';
+      btn.addEventListener('click', async () => {
+        try { await signInWithPopup(auth, googleProvider); }
+        catch (err) { setStatusLine("Sign-in failed: " + err.message, "error"); }
+      });
+      widget.appendChild(btn);
+      return;
+    }
+
+    const status = document.createElement('span');
+    status.className = 'auth-status ' + (isEditor ? 'editor' : 'readonly');
+    status.textContent = isEditor
+      ? `Editing enabled (${currentUser.email})`
+      : `Read-only (${currentUser.email})`;
+    widget.appendChild(status);
+
+    const signOutBtn = document.createElement('button');
+    signOutBtn.textContent = 'Sign out';
+    signOutBtn.addEventListener('click', () => signOut(auth));
+    widget.appendChild(signOutBtn);
+  }
+
+  // Runs automatically any time sign-in state changes (on load if
+  // already signed in from a previous visit, right after a successful
+  // sign-in, and right after sign-out).
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    isEditor = false;
+
+    if (user) {
+      // Checking ONLY this user's own document - the security rules
+      // block reading anyone else's, or listing the collection, so this
+      // is safe to do straight from the browser.
+      const editorDoc = await getDoc(doc(db, 'authorizedEditors', user.email));
+      isEditor = editorDoc.exists();
+    }
+
+    renderAuthWidget();
+    // Re-draw the currently visible table so it switches between
+    // editable dropdowns and read-only pills immediately, without
+    // needing a page refresh or tab switch.
+    if (activeSlug) renderMainTable();
+  });
+
+
+  // ===================== LOAD CONFIG, THEN BUILD TABS =====================
+  async function init() {
+    const res = await fetch('kingdoms-config.json');
+    const config = await res.json();
+    KINGDOMS = config.kingdoms;
+    SKYBOXES = config.skyboxes;
+
+    buildFilterPanel();
+    buildTabs();
+    populateSkyboxDatalist();
+    switchKingdom(KINGDOMS[0].slug); // open on the first Kingdom by default
+  }
+
+  function populateSkyboxDatalist() {
+    const datalist = document.getElementById('skyboxDatalist');
+    datalist.innerHTML = '';
+    SKYBOXES.forEach(sb => {
+      const option = document.createElement('option');
+      option.value = sb;
+      datalist.appendChild(option);
+    });
+  }
+
+  function buildTabs() {
+    const tabBar = document.getElementById('tabBar');
+    tabBar.innerHTML = '';
+    KINGDOMS.forEach(k => {
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn';
+      btn.textContent = k.label;
+      btn.dataset.slug = k.slug;
+      btn.addEventListener('click', () => switchKingdom(k.slug));
+      tabBar.appendChild(btn);
+    });
+  }
+
+  function setActiveTabStyling() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.slug === activeSlug);
+    });
+  }
+
+  // ===================== SWITCHING KINGDOMS =====================
+  function switchKingdom(slug) {
+    const kingdom = KINGDOMS.find(k => k.slug === slug);
+    if (!kingdom) return;
+
+    activeSlug = slug;
+    activeLabel = kingdom.label;
+    activeSubareas = kingdom.subareas;
+    currentData = {};
+
+    document.getElementById('activeKingdomName').textContent = activeLabel;
+    setActiveTabStyling();
+    buildSubareaFilterOptions();
+    buildMainTableSkeleton();
+
+    // Stop listening to the PREVIOUS Kingdom's collection before starting
+    // a new one - otherwise every past tab you've visited keeps updating
+    // in the background forever, which is wasted reads and a memory leak.
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+
+    unsubscribeSnapshot = onSnapshot(
+      collection(db, slug),
+      (snapshot) => {
+        if (snapshot.empty) {
+          setStatusLine(`No data yet for ${activeLabel}.`, "");
+        } else {
+          snapshot.forEach(docSnap => {
+            currentData[docSnap.id] = docSnap.data().statuses || {};
+          });
+          setStatusLine("Connected - live syncing.", "connected");
+        }
+        renderMainTable();
+        renderProgressCounter();
+        renderSummaryTable();
+      },
+      (err) => setStatusLine("Connection error: " + err.message, "error")
+    );
+  }
+
+  function setStatusLine(text, cls) {
+    const el = document.getElementById('statusLine');
+    el.textContent = text;
+    el.className = cls || '';
+  }
+
+  // ===================== MAIN STATUS TABLE =====================
+  function buildMainTableSkeleton() {
+    const thead = document.getElementById('mainTableHead');
+    let headHtml = '<tr><th>Subarea</th>';
+    SKYBOXES.forEach(sb => { headHtml += `<th>${sb}</th>`; });
+    headHtml += '</tr>';
+    thead.innerHTML = headHtml;
+
+    const tbody = document.getElementById('mainTableBody');
+    tbody.innerHTML = '';
+    activeSubareas.forEach(subarea => {
+      const row = document.createElement('tr');
+      row.id = 'row-' + subarea;
+      const nameTd = document.createElement('td');
+      nameTd.textContent = subarea;
+      nameTd.style.fontWeight = '600';
+      row.appendChild(nameTd);
+      tbody.appendChild(row);
+    });
+  }
+
+  function renderMainTable() {
+    activeSubareas.forEach(subarea => {
+      const row = document.getElementById('row-' + subarea);
+      if (!row) return;
+      const statuses = currentData[subarea] || {};
+
+      SKYBOXES.forEach(sb => {
+        let cellId = 'cell-' + subarea + '-' + sb;
+        let td = document.getElementById(cellId);
+        if (!td) {
+          td = document.createElement('td');
+          td.id = cellId;
+          row.appendChild(td);
+        }
+
+        const currentValue = statuses[sb] || "";
+
+        if (!isEditor) {
+          // Read-only view: a plain, non-interactive pill. This is what
+          // every visitor sees by default, and what non-approved signed-in
+          // users see too - only approved editors get the real dropdown.
+          const pill = document.createElement('span');
+          pill.className = 'status-pill-readonly ' + statusClass(currentValue);
+          pill.textContent = currentValue === "" ? "-- Not set --" : currentValue;
+          td.innerHTML = '';
+          td.appendChild(pill);
+          return;
+        }
+
+        const trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'status-trigger ' + statusClass(currentValue);
+        trigger.textContent = currentValue === "" ? "-- Select --" : currentValue;
+        trigger.dataset.value = currentValue;
+
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openStatusDropdown(trigger, trigger.dataset.value, async (newValue) => {
+            trigger.dataset.value = newValue;
+            trigger.textContent = newValue === "" ? "-- Select --" : newValue;
+            trigger.className = 'status-trigger ' + statusClass(newValue);
+            try {
+              await setDoc(doc(db, activeSlug, subarea), { statuses: { [sb]: newValue } }, { merge: true });
+              setStatusLine(`Saved "${sb}" for ${subarea}.`, "connected");
+            } catch (err) {
+              setStatusLine("Error saving: " + err.message, "error");
+            }
+          });
+        });
+
+        td.innerHTML = '';
+        td.appendChild(trigger);
+      });
+    });
+  }
+
+  // ===================== PROGRESS COUNTER =====================
+  // Same formula as the Apps Script version: total = every status cell
+  // across every subarea (subareas x 136 skyboxes), filled = how many
+  // aren't blank.
+  function renderProgressCounter() {
+    const badge = document.getElementById('progressBadge');
+    const totalCells = activeSubareas.length * SKYBOXES.length;
+    let filled = 0;
+
+    activeSubareas.forEach(subarea => {
+      const statuses = currentData[subarea] || {};
+      SKYBOXES.forEach(sb => {
+        if ((statuses[sb] || "").trim() !== "") filled++;
+      });
+    });
+
+    const pct = totalCells > 0 ? (filled / totalCells) * 100 : 0;
+    badge.textContent = `${filled} / ${totalCells} marked (${pct.toFixed(2)}%)`;
+    badge.classList.toggle('complete', totalCells > 0 && filled === totalCells);
+  }
+
+  // ===================== SUMMARY / ISSUES TABLE =====================
+  function buildSubareaFilterOptions() {
+    const select = document.getElementById('subareaFilterSelect');
+    select.innerHTML = '<option value="">All Subareas</option>';
+    activeSubareas.forEach(subarea => {
+      const opt = document.createElement('option');
+      opt.value = subarea;
+      opt.textContent = subarea;
+      select.appendChild(opt);
+    });
+    select.value = subareaFilter; // keep whatever was selected, if it still applies
+  }
+
+  function buildFilterPanel() {
+    const panel = document.getElementById('filterPanel');
+    panel.innerHTML = '';
+    STATUS_OPTIONS.filter(s => s !== "").forEach(status => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = !hiddenStatuses.has(status);
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) hiddenStatuses.delete(status);
+        else hiddenStatuses.add(status);
+        renderSummaryTable();
+      });
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode('Show "' + status + '"'));
+      panel.appendChild(label);
+    });
+  }
+
+  document.getElementById('toggleFiltersBtn').addEventListener('click', () => {
+    document.getElementById('filterPanel').classList.toggle('open');
+  });
+
+  document.getElementById('subareaFilterSelect').addEventListener('change', (e) => {
+    subareaFilter = e.target.value;
+    renderSummaryTable();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    searchQuery = e.target.value.trim().toLowerCase();
+    renderSummaryTable();
+  });
+
+  // Lists every (subarea, skybox) pair that: has a status set, isn't
+  // hidden by the filter checkboxes, matches the subarea dropdown (if
+  // one's selected), and matches the search box (if anything's typed).
+  function renderSummaryTable() {
+    const tbody = document.getElementById('summaryTableBody');
+    const emptyMsg = document.getElementById('emptySummary');
+    tbody.innerHTML = '';
+
+    let rowCount = 0;
+
+    activeSubareas.forEach(subarea => {
+      if (subareaFilter && subarea !== subareaFilter) return;
+      const statuses = currentData[subarea] || {};
+
+      SKYBOXES.forEach(sb => {
+        const value = statuses[sb] || "";
+        if (value === "") return;           // unset cells never show in the issues list
+        if (hiddenStatuses.has(value)) return;
+
+        if (searchQuery) {
+          const haystack = (subarea + ' ' + sb).toLowerCase();
+          if (!haystack.includes(searchQuery)) return;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${subarea}</td>
+          <td>${sb}</td>
+          <td class="${statusTextClass(value)}">${value}</td>
+        `;
+        tbody.appendChild(tr);
+        rowCount++;
+      });
+    });
+
+    emptyMsg.style.display = rowCount === 0 ? 'block' : 'none';
+  }
+
+  // ===================== WHEEL-TO-SCROLL-SIDEWAYS =====================
+  // Normally scrolling sideways needs Shift+wheel. Since this table is
+  // ALL horizontal scrolling (rows don't scroll independently), we
+  // redirect a normal vertical wheel motion into horizontal movement
+  // whenever the cursor is over the table specifically.
+  document.querySelector('.table-scroll-wrapper').addEventListener('wheel', (e) => {
+    const wrapper = e.currentTarget;
+    // Only hijack the wheel if there's actually somewhere to scroll to -
+    // otherwise this would block normal page scrolling on short tables.
+    if (wrapper.scrollWidth <= wrapper.clientWidth) return;
+    e.preventDefault();
+    wrapper.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  // Same treatment for the Kingdom tab bar - 17 tabs don't all fit on
+  // most screens, so this saves having to hold Shift to reach the ones
+  // further right.
+  document.getElementById('tabBar').addEventListener('wheel', (e) => {
+    const bar = e.currentTarget;
+    if (bar.scrollWidth <= bar.clientWidth) return;
+    e.preventDefault();
+    bar.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  // ===================== ALL-KINGDOMS + TOTAL PROGRESS =====================
+  // Unlike the per-tab counter (which stays live via onSnapshot), this
+  // does a ONE-TIME read across all 17 collections when you click the
+  // button - keeping 17 permanent live listeners running just for a
+  // summary panel would be wasteful. Click the button again any time to
+  // refresh it with the latest numbers.
+  document.getElementById('allProgressBtn').addEventListener('click', async () => {
+    const panel = document.getElementById('allProgressList');
+    const isOpen = panel.classList.contains('open');
+
+    if (isOpen) {
+      panel.classList.remove('open');
+      return;
+    }
+
+    panel.classList.add('open');
+    panel.innerHTML = '<div class="progress-list-row"><span class="kingdom-name">Loading all 17 Kingdoms...</span></div>';
+
+    let grandFilled = 0;
+    let grandTotal = 0;
+    const rows = [];
+
+    for (const kingdom of KINGDOMS) {
+      const snapshot = await getDocs(collection(db, kingdom.slug));
+      const totalCells = kingdom.subareas.length * SKYBOXES.length;
+      let filled = 0;
+
+      snapshot.forEach(docSnap => {
+        const statuses = docSnap.data().statuses || {};
+        SKYBOXES.forEach(sb => {
+          if ((statuses[sb] || "").trim() !== "") filled++;
+        });
+      });
+
+      grandFilled += filled;
+      grandTotal += totalCells;
+
+      const pct = totalCells > 0 ? (filled / totalCells) * 100 : 0;
+      rows.push({ label: kingdom.label, filled, totalCells, pct });
+    }
+
+    panel.innerHTML = '';
+    rows.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'progress-list-row';
+      row.innerHTML = `
+        <span class="kingdom-name">${r.label}</span>
+        <span class="kingdom-pct${r.filled === r.totalCells ? ' complete' : ''}">${r.pct.toFixed(2)}%</span>
+      `;
+      panel.appendChild(row);
+    });
+
+    const grandPct = grandTotal > 0 ? (grandFilled / grandTotal) * 100 : 0;
+    const totalRow = document.createElement('div');
+    totalRow.className = 'progress-list-row total-row';
+    totalRow.innerHTML = `
+      <span class="kingdom-name">Total</span>
+      <span class="kingdom-pct${grandFilled === grandTotal ? ' complete' : ''}">${grandFilled} / ${grandTotal} (${grandPct.toFixed(2)}%)</span>
+    `;
+    panel.appendChild(totalRow);
+  });
+
+  // ===================== SKYBOX JUMP SEARCH =====================
+  // Fires when the person picks an exact match from the datalist
+  // suggestions, or types a full name and presses Enter. Scrolls that
+  // column into view and briefly highlights it so it's obvious you
+  // landed in the right place among the 136 columns.
+  document.getElementById('skyboxJumpInput').addEventListener('change', (e) => {
+    const query = e.target.value.trim();
+    const colIndex = SKYBOXES.indexOf(query);
+    if (colIndex === -1) return; // not an exact skybox name yet - ignore until they pick a valid one
+
+    const headerCells = document.querySelectorAll('#mainTableHead th');
+    const targetTh = headerCells[colIndex + 1]; // +1 because column 0 is "Subarea"
+    if (!targetTh) return;
+
+    targetTh.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+    // Clear any previous highlight, then flash this column
+    document.querySelectorAll('.column-highlight').forEach(el => el.classList.remove('column-highlight'));
+    targetTh.classList.add('column-highlight');
+    document.querySelectorAll(`td[id$="-${query}"]`).forEach(td => td.classList.add('column-highlight'));
+
+    setTimeout(() => {
+      document.querySelectorAll('.column-highlight').forEach(el => el.classList.remove('column-highlight'));
+    }, 2000);
+  });
+
+  init();
+</script>
+
+</body>
+</html>
