@@ -192,6 +192,53 @@
     border-color: #5865F2;
   }
 
+  .tab-btn.guide-tab-btn.active {
+    background-color: #15803d;
+    border-color: #15803d;
+  }
+
+  /* ===================== GUIDE (authorizedEditors / admins only) ===================== */
+  .guide-panel {
+    max-width: 900px;
+    margin: 0 auto 24px;
+    color: #ddd;
+  }
+
+  .guide-panel > h2 {
+    color: #a3e6be;
+    border-bottom: 2px solid #17382d;
+    padding-bottom: 8px;
+    margin: 0 0 12px;
+    font-size: 1.2rem;
+  }
+
+  .guide-intro {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #bbb;
+    margin: 0 0 20px;
+  }
+
+  .guide-card {
+    background: #1e1f22;
+    border-left: 4px solid #333;
+    padding: 14px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  .guide-card h3 { margin: 0 0 6px; font-size: 14px; }
+  .guide-card p { margin: 0; font-size: 13px; color: #ccc; line-height: 1.5; }
+
+  .guide-card-good { border-left-color: #15803d; }
+  .guide-card-good h3 { color: #a3e6be; }
+
+  .guide-card-tone { border-left-color: #6d28d9; }
+  .guide-card-tone h3 { color: #b794f6; }
+
+  .guide-card-bad { border-left-color: #b91c1c; }
+  .guide-card-bad h3 { color: #ff8080; }
+
   /* ===================== SKYBOX JUMP SEARCH ===================== */
   .jump-search-input {
     background-color: #1a1a1a;
@@ -633,40 +680,62 @@
 
 <div class="tab-bar" id="tabBar"></div>
 
-<div>
-  <input type="text" class="jump-search-input" id="skyboxJumpInput" list="skyboxDatalist" placeholder="Jump to skybox column...">
-  <datalist id="skyboxDatalist"></datalist>
-</div>
+<div id="guidePanel" class="guide-panel" style="display:none;">
+  <h2>&#128214; Skybox Testing Guidelines</h2>
+  <p class="guide-intro">Please follow these standards strictly when testing and reviewing skyboxes across the kingdoms. If you're uncertain about any, mark it as Uncertain and it'll get checked later.</p>
 
-<p class="mobile-scroll-hint">Swipe sideways to see all skyboxes &rarr;</p>
-<div class="table-scroll-wrapper">
-  <table id="mainTable">
-    <thead id="mainTableHead"></thead>
-    <tbody id="mainTableBody"></tbody>
-  </table>
-</div>
+  <div class="guide-card guide-card-good">
+    <h3>&#128994; Good to Use</h3>
+    <p>Skyboxes that run smoothly, and do not impair visibility or visual comfort.</p>
+  </div>
 
-<div class="summary-header">
-  <h2>&#9888; Issues &amp; Actionable Skyboxes (<span id="activeKingdomName">-</span>)</h2>
-  <div class="progress-badge" id="progressBadge"></div>
-  <div class="summary-controls">
-    <button id="toggleFiltersBtn">Filters</button>
-    <select class="summary-select-filter" id="subareaFilterSelect">
-      <option value="">All Subareas</option>
-    </select>
-    <input type="text" class="summary-search-input" id="searchInput" placeholder="Search subarea or skybox...">
+  <div class="guide-card guide-card-tone">
+    <h3>&#127761; Good but Dark / &#128161; Good but Bright</h3>
+    <p><b>Dark skyboxes:</b> Fine as long as you can clearly see where you are going.<br><b>Bright skyboxes:</b> Fine as long as it is comfortable and <i>not</i> blindingly bright or washing out level geometry.</p>
+  </div>
+
+  <div class="guide-card guide-card-bad">
+    <h3>&#10060; Lags Kingdom / Lag (emu) / Motion Sickness</h3>
+    <p><b>Instant No.</b> Any skybox causing frame drops, hardware/emulator lag, or featuring disorienting warping/scrolling patterns that could trigger motion sickness.</p>
   </div>
 </div>
 
-<div id="filterPanel"></div>
+<div id="kingdomView">
+  <div>
+    <input type="text" class="jump-search-input" id="skyboxJumpInput" list="skyboxDatalist" placeholder="Jump to skybox column...">
+    <datalist id="skyboxDatalist"></datalist>
+  </div>
 
-<table class="summary-table">
-  <thead>
-    <tr><th>Loading Zone (Subarea)</th><th>Skybox</th><th>Status / Action</th></tr>
-  </thead>
-  <tbody id="summaryTableBody"></tbody>
-</table>
-<div id="emptySummary">Nothing matches the current filters.</div>
+  <p class="mobile-scroll-hint">Swipe sideways to see all skyboxes &rarr;</p>
+  <div class="table-scroll-wrapper">
+    <table id="mainTable">
+      <thead id="mainTableHead"></thead>
+      <tbody id="mainTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="summary-header">
+    <h2>&#9888; Issues &amp; Actionable Skyboxes (<span id="activeKingdomName">-</span>)</h2>
+    <div class="progress-badge" id="progressBadge"></div>
+    <div class="summary-controls">
+      <button id="toggleFiltersBtn">Filters</button>
+      <select class="summary-select-filter" id="subareaFilterSelect">
+        <option value="">All Subareas</option>
+      </select>
+      <input type="text" class="summary-search-input" id="searchInput" placeholder="Search subarea or skybox...">
+    </div>
+  </div>
+
+  <div id="filterPanel"></div>
+
+  <table class="summary-table">
+    <thead>
+      <tr><th>Loading Zone (Subarea)</th><th>Skybox</th><th>Status / Action</th></tr>
+    </thead>
+    <tbody id="summaryTableBody"></tbody>
+  </table>
+  <div id="emptySummary">Nothing matches the current filters.</div>
+</div>
 
 <script type="module">
   // ===================== FIREBASE SETUP =====================
@@ -849,6 +918,10 @@
   let activeSubareas = [];
   let currentData = {};        // { subareaName: { skyboxName: status } } for the CURRENTLY ACTIVE kingdom only
   let unsubscribeSnapshot = null; // stops the previous Kingdom's live listener when switching tabs
+  let viewingGuide = false; // true while the Guide tab (authorizedEditors/admins only) is showing
+  let kingdomsLoaded = false;   // kingdoms-config.json has finished loading
+  let authResolvedOnce = false; // Firebase has told us the sign-in state at least once
+  let initialViewChosen = false; // the landing tab (Guide vs first Kingdom) has been picked
 
   // Filters (shared across all Kingdoms, not reset when switching tabs)
   let hiddenStatuses = new Set(["Good to Use"]); // "Good to Use" hidden by default - the summary table is meant to highlight problems, not everything
@@ -910,9 +983,41 @@
     // Re-draw the currently visible table so it switches between
     // editable dropdowns and read-only pills immediately, without
     // needing a page refresh or tab switch.
-    if (activeSlug) renderMainTable();
+    if (activeSlug && !viewingGuide) renderMainTable();
+
+    // Guide tab only exists for authorizedEditors/admins - rebuild the
+    // tab bar so it appears/disappears immediately on sign-in/out,
+    // and bail out of the Guide view if access was just lost.
+    buildTabs();
+    if (viewingGuide && !isEditor) switchKingdom(activeSlug || KINGDOMS[0].slug);
+
+    if (!authResolvedOnce) {
+      // First time hearing from Firebase at all (either an already-signed-in
+      // session from a previous visit, or confirmation that nobody's signed
+      // in) - this decides the landing tab once kingdoms-config.json is
+      // also ready (see maybeChooseInitialView).
+      authResolvedOnce = true;
+      maybeChooseInitialView();
+    } else if (isEditor) {
+      // A later transition into a signed-in editor/admin session (an
+      // interactive sign-in after the page already settled on a tab) -
+      // jump straight to the Guide regardless of what they were looking at.
+      showGuide();
+    }
   });
 
+  // Picks the landing tab exactly once, as soon as both the Kingdom list
+  // and the initial auth check are ready: Guide for a signed-in
+  // authorizedEditor/admin, Cap Kingdom (the first Kingdom) for everyone else.
+  function maybeChooseInitialView() {
+    if (initialViewChosen || !kingdomsLoaded || !authResolvedOnce) return;
+    initialViewChosen = true;
+    if (isEditor) {
+      showGuide();
+    } else {
+      switchKingdom(KINGDOMS[0].slug);
+    }
+  }
 
   // ===================== LOAD CONFIG, THEN BUILD TABS =====================
   async function init() {
@@ -920,11 +1025,12 @@
     const config = await res.json();
     KINGDOMS = config.kingdoms;
     SKYBOXES = config.skyboxes;
+    kingdomsLoaded = true;
 
     buildFilterPanel();
     buildTabs();
     populateSkyboxDatalist();
-    switchKingdom(KINGDOMS[0].slug); // open on the first Kingdom by default
+    maybeChooseInitialView();
   }
 
   function populateSkyboxDatalist() {
@@ -940,6 +1046,17 @@
   function buildTabs() {
     const tabBar = document.getElementById('tabBar');
     tabBar.innerHTML = '';
+
+    // Guide tab only exists for signed-in authorizedEditors/admins -
+    // testers never see it at all, not just a hidden/disabled button.
+    if (isEditor) {
+      const guideBtn = document.createElement('button');
+      guideBtn.className = 'tab-btn guide-tab-btn';
+      guideBtn.textContent = 'Guide';
+      guideBtn.addEventListener('click', showGuide);
+      tabBar.appendChild(guideBtn);
+    }
+
     KINGDOMS.forEach(k => {
       const btn = document.createElement('button');
       btn.className = 'tab-btn';
@@ -948,18 +1065,37 @@
       btn.addEventListener('click', () => switchKingdom(k.slug));
       tabBar.appendChild(btn);
     });
+
+    setActiveTabStyling();
   }
 
   function setActiveTabStyling() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.slug === activeSlug);
+      if (btn.classList.contains('guide-tab-btn')) {
+        btn.classList.toggle('active', viewingGuide);
+      } else {
+        btn.classList.toggle('active', !viewingGuide && btn.dataset.slug === activeSlug);
+      }
     });
+  }
+
+  // ===================== GUIDE (authorizedEditors / admins only) =====================
+  function showGuide() {
+    if (!isEditor) return; // defensive - the tab shouldn't exist otherwise
+    viewingGuide = true;
+    document.getElementById('kingdomView').style.display = 'none';
+    document.getElementById('guidePanel').style.display = 'block';
+    setActiveTabStyling();
   }
 
   // ===================== SWITCHING KINGDOMS =====================
   function switchKingdom(slug) {
     const kingdom = KINGDOMS.find(k => k.slug === slug);
     if (!kingdom) return;
+
+    viewingGuide = false;
+    document.getElementById('guidePanel').style.display = 'none';
+    document.getElementById('kingdomView').style.display = '';
 
     activeSlug = slug;
     activeLabel = kingdom.label;
