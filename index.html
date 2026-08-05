@@ -334,35 +334,10 @@
 <div id="creditsOverlay" class="credits-overlay">
   <div class="credits-modal">
     <button id="creditsClose" class="credits-close" aria-label="Close">&times;</button>
-    <h2>Thanks</h2>
-    <p>And so, all the skyboxes have been tested in every kingdom, every single subarea, all for the max setting, so you can play with stabilze shaders off without the game becoming unplayable.</p>
-
-    <h3>Now I do want to give thanks to all the Testers who have helped test all these skyboxes in everything:</h3>
-    <ul class="credits-list">
-      <li><b>@onijuiku</b> - ofc Me, Cap Kingdom, Lost Kingdom, Cloud Kingdom, Darker Side</li>
-      <li><b>@nindybk</b> - worked on Lake Kingdom, Partial bowsers</li>
-      <li><b>@retrosnug</b> - Ruined Kingdom, Partial Metro</li>
-      <li><b>@mickystam521</b> - Partial Cascade</li>
-      <li><b>@triblades_01975</b> - Cascade kingdom,</li>
-      <li><b>@kosmirionepos</b> - a fallen tester, due to PC specs</li>
-      <li><b>@kleintimmi</b> - he was here, he just existed</li>
-    </ul>
-
-    <h3>Lastly To the People who made all of this possible, and I am Truely Grateful for:</h3>
-    <ul class="credits-list">
-      <li><b>@firerisingraging</b> - for allowing me to use his Tracker Code to make the Grid for all the skyboxes, helped make the Spreadsheet, and the Graphic for the skybox state</li>
-      <li><b>@baconfearmc</b> - for Providing the Debug Level for me to get all the Images for the Skybox Grid</li>
-      <li><b>@maliciousmajora</b> - For Providing the In-Game Names for this project</li>
-    </ul>
-
-    <h3>Last person to mention:</h3>
-    <ul class="credits-list">
-      <li><b>@secretdev</b> - For allowing me to make this project possible, and all of this possible in general, Could Never have done this without him, we all give our Love to you Secretdev.</li>
-    </ul>
-
-    <p>This Project has been alot of Fun, and ofc it isnt over, same with the logic state, there is probably going to be some edge cases that will need to be fixed as we are not perfect, and I will gladly work with the team again to fix those edge cases. I Do Hope yall Enjoy what we have cooked up, and have a very pleasant day to you all.</p>
-
-    <p class="credits-sign">Sincerly Onijuiku_</p>
+    <!-- Intentionally empty - populated at runtime from Firestore, only
+         after the admins check succeeds, so nothing is in the page
+         source for testers to find via view-source. -->
+    <div id="creditsBody"></div>
   </div>
 </div>
 
@@ -492,9 +467,95 @@
       onAuthStateChanged(auth, async (user) => {
         if (!user) return;
         const adminDoc = await getDoc(doc(db, 'admins', user.email));
-        if (adminDoc.exists()) creditsButton.style.display = 'flex';
+        if (!adminDoc.exists()) return;
+
+        // Only fetched (and only exists in the page at all) once the
+        // admin check above has passed - a tester using view-source
+        // sees an empty #creditsBody, never the actual text.
+        const contentDoc = await getDoc(doc(db, 'siteContent', 'credits'));
+        const body = document.getElementById('creditsBody');
+        if (contentDoc.exists() && contentDoc.data().content) {
+          renderCreditsBody(body, contentDoc.data().content);
+        } else {
+          const p = document.createElement('p');
+          p.textContent = 'No credits content set yet - add a "content" field to siteContent/credits in Firestore.';
+          body.appendChild(p);
+        }
+        creditsButton.style.display = 'flex';
       });
     });
+  }
+
+  // Turns a simple plain-text format into the credits DOM, built with
+  // createElement/textContent (never innerHTML) so admin-authored
+  // Firestore content can't inject markup:
+  //   first line          -> title (h2)
+  //   "## heading"         -> section heading (h3)
+  //   "- @who - did what"  -> list item, bolding the "@who" part
+  //   "*signed text*"      -> italic sign-off line
+  //   blank line           -> ends the current list
+  //   anything else        -> paragraph
+  function renderCreditsBody(container, text) {
+    container.innerHTML = '';
+    const lines = text.split('\n').map(l => l.trim());
+    let usedTitle = false;
+    let currentList = null;
+
+    for (const line of lines) {
+      if (line === '') { currentList = null; continue; }
+
+      if (!usedTitle) {
+        const h2 = document.createElement('h2');
+        h2.textContent = line;
+        container.appendChild(h2);
+        usedTitle = true;
+        currentList = null;
+        continue;
+      }
+
+      if (line.startsWith('## ')) {
+        const h3 = document.createElement('h3');
+        h3.textContent = line.slice(3);
+        container.appendChild(h3);
+        currentList = null;
+        continue;
+      }
+
+      if (line.startsWith('- ')) {
+        if (!currentList) {
+          currentList = document.createElement('ul');
+          currentList.className = 'credits-list';
+          container.appendChild(currentList);
+        }
+        const li = document.createElement('li');
+        const rest = line.slice(2);
+        const splitIdx = rest.indexOf(' - ');
+        if (rest.startsWith('@') && splitIdx !== -1) {
+          const b = document.createElement('b');
+          b.textContent = rest.slice(0, splitIdx);
+          li.appendChild(b);
+          li.appendChild(document.createTextNode(rest.slice(splitIdx)));
+        } else {
+          li.textContent = rest;
+        }
+        currentList.appendChild(li);
+        continue;
+      }
+
+      if (line.length > 1 && line.startsWith('*') && line.endsWith('*')) {
+        const p = document.createElement('p');
+        p.className = 'credits-sign';
+        p.textContent = line.slice(1, -1);
+        container.appendChild(p);
+        currentList = null;
+        continue;
+      }
+
+      const p = document.createElement('p');
+      p.textContent = line;
+      container.appendChild(p);
+      currentList = null;
+    }
   }
 </script>
 </body>
