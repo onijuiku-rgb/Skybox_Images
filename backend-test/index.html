@@ -1149,12 +1149,22 @@
           if (!haystack.includes(searchQuery)) return;
         }
 
+        // Built with textContent (not innerHTML) - unlike subarea/sb (from
+        // our own static config), value comes straight from Firestore, and
+        // the security rules only check write SHAPE, not content, so an
+        // editor account could otherwise inject raw HTML/script here that
+        // would run in every visitor's browser.
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${subarea}</td>
-          <td>${sb}</td>
-          <td class="${statusTextClass(value)}">${value}</td>
-        `;
+        const subareaTd = document.createElement('td');
+        subareaTd.textContent = subarea;
+        const skyboxTd = document.createElement('td');
+        skyboxTd.textContent = sb;
+        const statusTd = document.createElement('td');
+        statusTd.className = statusTextClass(value);
+        statusTd.textContent = value;
+        tr.appendChild(subareaTd);
+        tr.appendChild(skyboxTd);
+        tr.appendChild(statusTd);
         tbody.appendChild(tr);
         rowCount++;
       });
