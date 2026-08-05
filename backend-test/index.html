@@ -894,11 +894,16 @@
     isEditor = false;
 
     if (user) {
-      // Checking ONLY this user's own document - the security rules
-      // block reading anyone else's, or listing the collection, so this
-      // is safe to do straight from the browser.
-      const editorDoc = await getDoc(doc(db, 'authorizedEditors', user.email));
-      isEditor = editorDoc.exists();
+      // Checking ONLY this user's own documents - the security rules
+      // block reading anyone else's, or listing either collection, so
+      // this is safe to do straight from the browser. Admins get editor
+      // access automatically, without also needing to be listed in
+      // authorizedEditors.
+      const [editorDoc, adminDoc] = await Promise.all([
+        getDoc(doc(db, 'authorizedEditors', user.email)),
+        getDoc(doc(db, 'admins', user.email))
+      ]);
+      isEditor = editorDoc.exists() || adminDoc.exists();
     }
 
     renderAuthWidget();

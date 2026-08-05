@@ -6,111 +6,496 @@
 <title>Super Mario Odyssey Skybox Project</title>
 <style>
   * { box-sizing: border-box; }
-
   body {
     margin: 0;
-    min-height: 100vh;
-    background-color: #121212;
-    color: #e6e6e6;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #1a1a1a;
+    color: #2a2a2a;
+  }
+
+  .brochure {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ===================== LEFT: INFO PANEL ===================== */
+  .panel-left {
+    width: 22%;
+    min-width: 300px;
+    background: #f7f3e9;
+    padding: 22px 22px 16px;
+    border-right: 2px solid #d8cfb0;
+  }
+
+  .hero-photo { border-radius: 6px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 6px 14px rgba(0,0,0,0.25); }
+  .hero-photo img { width: 100%; height: 110px; object-fit: cover; display: block; }
+
+  .kicker { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #8a7a4a; font-weight: 800; }
+  .panel-left h1 { font-size: 1.7rem; margin: 4px 0 2px; font-weight: 900; color: #1f2a1f; }
+  .subtitle { font-size: 11.5px; color: #6b6248; margin: 0 0 12px; }
+
+  hr { border: none; border-top: 2px solid #d8cfb0; margin: 12px 0; }
+
+  .section-title { font-size: 1.1rem; margin: 0 0 6px; font-weight: 800; color: #1f2a1f; }
+  .lede { font-size: 12px; color: #4a4436; line-height: 1.5; margin: 0 0 12px; }
+
+  .stats-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; }
+  .stats-table td { padding: 4px 0; border-bottom: 1px solid #e5ddc4; }
+  .stats-table td:first-child { color: #8a7a4a; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: 9.5px; }
+  .stats-table td:last-child { text-align: right; font-weight: 700; color: #1f2a1f; }
+
+  .thumb-row { display: flex; gap: 8px; margin-bottom: 14px; }
+  .thumb-row img { width: 50%; height: 62px; object-fit: cover; border-radius: 4px; display: block; }
+
+  .body-block h3 { font-size: 12.5px; margin: 0 0 4px; color: #1f2a1f; font-weight: 800; }
+  .body-block p { font-size: 11px; color: #55503f; line-height: 1.55; margin: 0 0 10px; }
+
+  .credit { font-size: 9.5px; color: #a99b6e; margin-top: 4px; }
+  .credit a { color: #8a7a4a; }
+
+  /* ===================== CENTER: MAP PANEL ===================== */
+  .panel-map {
+    flex: 1;
+    position: relative;
+    background: #cfe8d8;
+    overflow: hidden;
+    min-height: 500px;
+  }
+
+  .ruler-top, .ruler-left { position: absolute; font-size: 9px; color: rgba(0,0,0,0.28); font-weight: 700; }
+  .ruler-top { top: 6px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 24px; }
+  .ruler-left { left: 6px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; }
+
+  .map-shape {
+    position: absolute;
+    top: 4%; left: 22%; right: 22%; bottom: 4%;
+  }
+  .map-shape svg { width: 100%; height: 100%; filter: drop-shadow(0 5px 0 #4f9760); }
+  .shape-outline { fill: #4f9760; }
+  .shape-fill { fill: #7ec98f; }
+  .shape-inner { fill: #8fd49e; opacity: 0.7; }
+
+  .pin {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 900;
+    font-size: 14px;
+    z-index: 2;
+  }
+  .pin-badge {
+    width: 34px; height: 34px; border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.35);
+    border: 2px solid #fff;
+  }
+  .pin-badge span { transform: rotate(45deg); }
+
+  .pin1 { top: 52%; left: 32%; }
+  .pin2 { top: 52%; left: 68%; }
+  .pin3 { top: 70%; left: 50%; }
+  .pin1 .pin-badge { background: #4c6fef; }
+  .pin2 .pin-badge { background: #6fcf97; }
+  .pin3 .pin-badge { background: #ef8c4c; }
+
+  .you-are-here {
+    position: absolute; top: 20%; left: 39%;
+    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #e63946; color: #fff; font-weight: 900; font-size: 13px;
+    border: 3px solid #fff; box-shadow: 0 6px 10px rgba(0,0,0,0.4); z-index: 3;
+  }
+
+  .legend {
+    position: absolute; bottom: 14px; left: 14px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 10.5px;
+    color: #2a2a2a;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 60px 20px;
+    gap: 5px;
+  }
+  .legend div { display: flex; align-items: center; gap: 8px; }
+  .legend .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+  /* ===================== RIGHT: LORE PANEL ===================== */
+  .panel-right {
+    width: 24%;
+    min-width: 300px;
+    background: #f4b942;
+    padding: 20px 20px 60px;
+    position: relative;
+    border-left: 2px solid #d99e2a;
   }
 
-  h1 {
-    margin: 0 0 8px;
-    font-size: 1.8rem;
-    text-align: center;
-  }
+  .story-block { display: flex; gap: 10px; margin-bottom: 16px; text-decoration: none; }
+  .story-text h3 { font-size: 12px; margin: 0 0 4px; color: #2a1f08; font-weight: 800; }
+  .story-text p { font-size: 10.5px; color: #4a3a12; line-height: 1.45; margin: 0; }
+  .story-photo { width: 74px; height: 54px; object-fit: cover; border-radius: 5px; flex-shrink: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.25); }
 
-  p.subtitle {
-    color: #999;
-    margin: 0 0 40px;
-    text-align: center;
-    max-width: 480px;
-    font-size: 14px;
-  }
-
-  .link-grid {
-    display: grid;
-    gap: 16px;
-    width: 100%;
-    max-width: 420px;
-  }
-
-  .link-card {
-    display: block;
-    background-color: rgba(30, 31, 34, 0.9);
-    border: 1px solid #3f4147;
+  .keys-box {
+    background: rgba(255,255,255,0.25);
+    border: 1.5px solid rgba(255,255,255,0.4);
     border-radius: 8px;
-    padding: 18px 20px;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-    transition: border-color 0.15s ease;
+    padding: 12px 14px;
+    margin-top: 6px;
+  }
+  .keys-box h4 { font-size: 11.5px; margin: 0 0 6px; color: #2a1f08; font-weight: 800; }
+  .keys-box ol { margin: 0; padding-left: 16px; font-size: 10px; color: #3a2c0a; line-height: 1.6; }
+
+  .keys-total {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(42,31,8,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: #2a1f08;
+    font-weight: 700;
+  }
+  .keys-total .keys-total-pct { color: #4a3a12; }
+  .keys-total .keys-total-pct.complete { color: #15803d; }
+
+  .a-button {
+    position: absolute; bottom: 16px; right: 16px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #fff; color: #f4b942; font-weight: 900; font-size: 17px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+    border: 3px solid #2a1f08;
   }
 
-  .link-card:hover {
-    border-color: #5865F2;
+  /* ===================== CREDITS (hidden until reveal) ===================== */
+  .credits-button {
+    position: absolute; bottom: 62px; right: 20px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.9); color: #b5860f; font-weight: 900; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    border: 2px solid #2a1f08;
+    cursor: pointer;
+  }
+  .credits-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(20,15,5,0.72);
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 24px;
+  }
+  .credits-overlay.open { display: flex; }
+  .credits-modal {
+    background: #f7f3e9;
+    border-radius: 10px;
+    border: 2px solid #d8cfb0;
+    max-width: 560px; width: 100%;
+    max-height: 84vh;
+    overflow-y: auto;
+    padding: 28px 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .credits-modal h2 { font-size: 1.4rem; margin: 0 0 10px; color: #1f2a1f; }
+  .credits-modal h3 { font-size: 1rem; margin: 20px 0 8px; color: #1f2a1f; }
+  .credits-modal p { font-size: 12.5px; line-height: 1.6; color: #4a4436; margin: 0 0 10px; }
+  .credits-list { list-style: none; margin: 0 0 6px; padding: 0; }
+  .credits-list li { font-size: 12px; line-height: 1.7; color: #3a3626; }
+  .credits-list li b { color: #1f2a1f; }
+  .credits-sign { font-style: italic; font-size: 12px; color: #6b6248; margin-top: 16px; }
+  .credits-close {
+    position: absolute; top: 12px; right: 14px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #2a1f08; color: #fff; border: none;
+    font-size: 14px; font-weight: 900; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
   }
 
-  .link-card .card-title {
-    font-weight: 600;
-    font-size: 15px;
-    color: #ffffff;
-    margin-bottom: 4px;
-    border-left: 4px solid #5865F2;
-    padding-left: 10px;
+  @media (max-width: 900px) {
+    .brochure { flex-direction: column; }
+    .panel-left, .panel-right { width: 100%; min-width: 0; }
+    .panel-map { min-height: 420px; }
   }
-
-  .link-card .card-desc {
-    font-size: 12px;
-    color: #999;
-    padding-left: 14px;
-  }
-
-  .link-card.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  footer {
-    margin-top: 60px;
-    color: #555;
-    font-size: 12px;
-    text-align: center;
-  }
-
-  footer a { color: #8ab4f8; }
 </style>
 </head>
 <body>
 
-<h1>Super Mario Odyssey Skybox Project</h1>
-<p class="subtitle">Community reference material from ongoing skybox testing and documentation.</p>
+<div class="brochure">
 
-<div class="link-grid">
-  <a class="link-card" href="names/">
-    <div class="card-title">Skybox Names</div>
-    <div class="card-desc">All 136 internal skybox names and where each one is used in-game.</div>
-  </a>
+  <div class="panel-left">
+    <div class="hero-photo"><img id="heroPhoto" src="https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CapWorldHomeStage.png" alt=""></div>
+    <div class="kicker">Super Mario Odyssey</div>
+    <h1>Skybox Hub</h1>
+    <p class="subtitle">Community reference &amp; live testing hub</p>
+    <hr>
+    <div class="section-title">Explore the Project</div>
+    <p class="lede">Track, document, and browse every skybox across all 17 Kingdoms.</p>
 
-  <a class="link-card" href="skybox/">
-    <div class="card-title">Skybox Gallery</div>
-    <div class="card-desc">Browse every documented skybox in one connection map.</div>
-  </a>
+    <table class="stats-table">
+      <tr><td>Skyboxes</td><td>136</td></tr>
+      <tr><td>Kingdoms</td><td>17</td></tr>
+      <tr><td>Status</td><td>Active</td></tr>
+      <tr><td>Access</td><td>Public</td></tr>
+    </table>
 
-  <a class="link-card" href="backend-test/">
-    <div class="card-title">Skybox Patrol</div>
-    <div class="card-desc">Live results from testing every skybox in every Kingdom.</div>
-  </a>
+    <div class="thumb-row">
+      <img id="thumbPhoto1" src="https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/CloudWorldHomeStage.png" alt="">
+      <img id="thumbPhoto2" src="https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/LavaWorldHomeStage.png" alt="">
+    </div>
+
+    <div class="body-block">
+      <h3>Built By Testers</h3>
+      <p>Every entry here comes from real testing sessions - checked for lag, visual glitches, and general fit before it's marked good to use.</p>
+    </div>
+
+    <p class="credit">Images hosted from this repository via <a href="https://www.jsdelivr.com/" target="_blank" rel="noopener">jsDelivr</a>.</p>
+  </div>
+
+  <div class="panel-map">
+    <div class="ruler-top"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+    <div class="ruler-left"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span></div>
+
+    <div class="map-shape">
+      <svg viewBox="0 0 200 220" preserveAspectRatio="xMidYMid meet">
+        <g class="shape-outline" transform="translate(100 116) scale(1.035) translate(-100 -116)">
+          <path d="M 78 116 C 68 90 60 55 66 28 C 68 14 78 6 86 10 C 92 14 90 30 92 50 C 94 75 96 96 98 116 Z"/>
+          <path d="M 122 116 C 132 90 140 55 134 28 C 132 14 122 6 114 10 C 108 14 110 30 108 50 C 106 75 104 96 102 116 Z"/>
+          <circle cx="100" cy="150" r="64"/>
+        </g>
+        <path class="shape-fill" d="M 78 116 C 68 90 60 55 66 28 C 68 14 78 6 86 10 C 92 14 90 30 92 50 C 94 75 96 96 98 116 Z"/>
+        <path class="shape-fill" d="M 122 116 C 132 90 140 55 134 28 C 132 14 122 6 114 10 C 108 14 110 30 108 50 C 106 75 104 96 102 116 Z"/>
+        <circle class="shape-fill" cx="100" cy="150" r="64"/>
+        <ellipse class="shape-inner" cx="80" cy="62" rx="6" ry="34" transform="rotate(-10 80 62)"/>
+        <ellipse class="shape-inner" cx="120" cy="62" rx="6" ry="34" transform="rotate(10 120 62)"/>
+        <circle class="shape-inner" cx="100" cy="160" r="34"/>
+      </svg>
+      <div class="you-are-here" title="You Are Here">M</div>
+      <a class="pin pin1" href="names/" title="Skybox Names"><div class="pin-badge"><span>N</span></div></a>
+      <a class="pin pin2" href="skybox/" title="Skybox Gallery"><div class="pin-badge"><span>G</span></div></a>
+      <a class="pin pin3" href="backend-test/" title="Skybox Patrol"><div class="pin-badge"><span>P</span></div></a>
+    </div>
+
+    <div class="legend">
+      <div><span class="dot" style="background:#e63946"></span>You Are Here</div>
+      <div><span class="dot" style="background:#4c6fef"></span>Skybox Names</div>
+      <div><span class="dot" style="background:#6fcf97"></span>Skybox Gallery</div>
+      <div><span class="dot" style="background:#ef8c4c"></span>Skybox Patrol</div>
+    </div>
+  </div>
+
+  <div class="panel-right">
+    <a class="story-block" href="names/">
+      <div class="story-text">
+        <h3>Skybox Names</h3>
+        <p>All 136 internal skybox names, and exactly where each one is used in-game.</p>
+      </div>
+      <img class="story-photo" src="https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SandWorldHomeStage.png" alt="">
+    </a>
+    <a class="story-block" href="skybox/">
+      <div class="story-text">
+        <h3>Skybox Gallery</h3>
+        <p>Browse every documented skybox in one connection map.</p>
+      </div>
+      <img class="story-photo" src="https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/ForestWorldHomeStage.png" alt="">
+    </a>
+    <a class="story-block" href="backend-test/">
+      <div class="story-text">
+        <h3>Skybox Patrol</h3>
+        <p>Live results from testing every skybox in every Kingdom.</p>
+      </div>
+      <img class="story-photo" src="https://cdn.jsdelivr.net/gh/onijuiku-rgb/Skybox_Images/Images/SkyWorldHomeStage.png" alt="">
+    </a>
+
+    <div class="keys-box">
+      <h4>Three Ways In</h4>
+      <ol>
+        <li>Look up a skybox name and where it's used</li>
+        <li>Browse the full gallery, Kingdom by Kingdom</li>
+        <li>Check live testing status on Skybox Patrol</li>
+      </ol>
+      <div class="keys-total" id="hubTotalProgress">
+        <span>Total</span>
+        <span class="keys-total-pct">Loading...</span>
+      </div>
+    </div>
+
+    <div class="a-button">A</div>
+    <button id="creditsButton" class="credits-button" title="Credits" aria-label="Credits" style="display:none">&#9733;</button>
+  </div>
+
 </div>
 
-<footer>
-  Images hosted from this repository via <a href="https://www.jsdelivr.com/" target="_blank" rel="noopener">jsDelivr</a>.
-</footer>
+<div id="creditsOverlay" class="credits-overlay">
+  <div class="credits-modal">
+    <button id="creditsClose" class="credits-close" aria-label="Close">&times;</button>
+    <h2>Thanks</h2>
+    <p>And so, all the skyboxes have been tested in every kingdom, every single subarea, all for the max setting, so you can play with stabilze shaders off without the game becoming unplayable.</p>
 
+    <h3>Now I do want to give thanks to all the Testers who have helped test all these skyboxes in everything:</h3>
+    <ul class="credits-list">
+      <li><b>@onijuiku</b> - ofc Me, Cap Kingdom, Lost Kingdom, Cloud Kingdom, Darker Side</li>
+      <li><b>@nindybk</b> - worked on Lake Kingdom, Partial bowsers</li>
+      <li><b>@retrosnug</b> - Ruined Kingdom, Partial Metro</li>
+      <li><b>@mickystam521</b> - Partial Cascade</li>
+      <li><b>@triblades_01975</b> - Cascade kingdom,</li>
+      <li><b>@kosmirionepos</b> - a fallen tester, due to PC specs</li>
+      <li><b>@kleintimmi</b> - he was here, he just existed</li>
+    </ul>
+
+    <h3>Lastly To the People who made all of this possible, and I am Truely Grateful for:</h3>
+    <ul class="credits-list">
+      <li><b>@firerisingraging</b> - for allowing me to use his Tracker Code to make the Grid for all the skyboxes, helped make the Spreadsheet, and the Graphic for the skybox state</li>
+      <li><b>@baconfearmc</b> - for Providing the Debug Level for me to get all the Images for the Skybox Grid</li>
+      <li><b>@maliciousmajora</b> - For Providing the In-Game Names for this project</li>
+    </ul>
+
+    <h3>Last person to mention:</h3>
+    <ul class="credits-list">
+      <li><b>@secretdev</b> - For allowing me to make this project possible, and all of this possible in general, Could Never have done this without him, we all give our Love to you Secretdev.</li>
+    </ul>
+
+    <p>This Project has been alot of Fun, and ofc it isnt over, same with the logic state, there is probably going to be some edge cases that will need to be fixed as we are not perfect, and I will gladly work with the team again to fix those edge cases. I Do Hope yall Enjoy what we have cooked up, and have a very pleasant day to you all.</p>
+
+    <p class="credits-sign">Sincerly Onijuiku_</p>
+  </div>
+</div>
+
+<script>
+  // Swaps the hero photo + 2 thumbnails for 3 random skyboxes on every
+  // load, so the top-left photos aren't the same every visit.
+  fetch('skybox/skybox.json')
+    .then(res => res.json())
+    .then(entries => {
+      const pool = entries.slice();
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      const [hero, thumb1, thumb2] = pool;
+
+      const heroEl = document.getElementById('heroPhoto');
+      const thumb1El = document.getElementById('thumbPhoto1');
+      const thumb2El = document.getElementById('thumbPhoto2');
+
+      if (hero && heroEl) { heroEl.src = hero.image; heroEl.alt = hero.name; }
+      if (thumb1 && thumb1El) { thumb1El.src = thumb1.image; thumb1El.alt = thumb1.name; }
+      if (thumb2 && thumb2El) { thumb2El.src = thumb2.image; thumb2El.alt = thumb2.name; }
+    })
+    .catch(() => {}); // keep the default photos if the fetch fails
+</script>
+
+<script type="module">
+  // Live overall testing progress, shown under "Three Ways In" - same
+  // public data and math as the "All Kingdoms Progress" total on the
+  // Skybox Patrol tab (no auth needed, statuses are public-read).
+  import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js").then(async ({ initializeApp }) => {
+    const { getFirestore, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
+
+    const totalEl = document.querySelector('#hubTotalProgress .keys-total-pct');
+
+    try {
+      const firebaseConfig = {
+        apiKey: "AIzaSyAzJhU7wI1iFPEExIgCD-DpZ8sKljtH7Yk",
+        authDomain: "smo-skybox-testing.firebaseapp.com",
+        projectId: "smo-skybox-testing",
+        storageBucket: "smo-skybox-testing.firebasestorage.app",
+        messagingSenderId: "604114241784",
+        appId: "1:604114241784:web:591528df76f683a843530d"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const res = await fetch('backend-test/kingdoms-config.json');
+      const config = await res.json();
+      const { kingdoms, skyboxes } = config;
+
+      let grandFilled = 0;
+      let grandTotal = 0;
+
+      for (const kingdom of kingdoms) {
+        const snapshot = await getDocs(collection(db, kingdom.slug));
+        const totalCells = kingdom.subareas.length * skyboxes.length;
+        let filled = 0;
+
+        snapshot.forEach(docSnap => {
+          const statuses = docSnap.data().statuses || {};
+          skyboxes.forEach(sb => {
+            if ((statuses[sb] || "").trim() !== "") filled++;
+          });
+        });
+
+        grandFilled += filled;
+        grandTotal += totalCells;
+      }
+
+      const grandPct = grandTotal > 0 ? (grandFilled / grandTotal) * 100 : 0;
+      totalEl.textContent = `${grandFilled} / ${grandTotal} (${grandPct.toFixed(2)}%)`;
+      if (grandFilled === grandTotal) totalEl.classList.add('complete');
+    } catch (err) {
+      totalEl.textContent = "Unavailable";
+    }
+  }).catch(() => {
+    const totalEl = document.querySelector('#hubTotalProgress .keys-total-pct');
+    if (totalEl) totalEl.textContent = "Unavailable";
+  });
+</script>
+
+<script type="module">
+  // Flip to true for the actual public reveal.
+  const CREDITS_REVEALED = false;
+
+  // Shows the credits button only to signed-in admins (the "admins"
+  // Firestore collection - a separate, smaller allowlist than
+  // authorizedEditors, which every tester with edit access is on).
+  const CREDITS_AUTH_GATE_ENABLED = true;
+
+  const creditsButton = document.getElementById('creditsButton');
+  const creditsOverlay = document.getElementById('creditsOverlay');
+  const creditsClose = document.getElementById('creditsClose');
+
+  creditsButton.addEventListener('click', () => creditsOverlay.classList.add('open'));
+  creditsClose.addEventListener('click', () => creditsOverlay.classList.remove('open'));
+  creditsOverlay.addEventListener('click', (e) => {
+    if (e.target === creditsOverlay) creditsOverlay.classList.remove('open');
+  });
+
+  if (CREDITS_REVEALED) {
+    creditsButton.style.display = 'flex';
+  } else if (CREDITS_AUTH_GATE_ENABLED) {
+    // No sign-in UI here on purpose - this only checks whether a session
+    // from the Skybox Patrol tab (same Firebase project/origin) is already
+    // signed in as an admin, without prompting testers to log in.
+    import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js").then(async ({ initializeApp }) => {
+      const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
+      const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAzJhU7wI1iFPEExIgCD-DpZ8sKljtH7Yk",
+        authDomain: "smo-skybox-testing.firebaseapp.com",
+        projectId: "smo-skybox-testing",
+        storageBucket: "smo-skybox-testing.firebasestorage.app",
+        messagingSenderId: "604114241784",
+        appId: "1:604114241784:web:591528df76f683a843530d"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return;
+        const adminDoc = await getDoc(doc(db, 'admins', user.email));
+        if (adminDoc.exists()) creditsButton.style.display = 'flex';
+      });
+    });
+  }
+</script>
 </body>
 </html>
