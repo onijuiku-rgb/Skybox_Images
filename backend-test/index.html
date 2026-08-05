@@ -239,6 +239,56 @@
   .guide-card-bad { border-left-color: #b91c1c; }
   .guide-card-bad h3 { color: #ff8080; }
 
+  /* ===================== RANDOMIZER (admins only) ===================== */
+  .tab-btn.randomizer-tab-btn.active {
+    background-color: #b45309;
+    border-color: #b45309;
+  }
+
+  .randomizer-panel {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+  }
+
+  .randomizer-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+    color: #aaa;
+  }
+
+  .randomizer-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #189844;
+    box-shadow: 0 0 6px #189844;
+    flex-shrink: 0;
+  }
+
+  #randomizerDownloadBtn {
+    margin-left: auto;
+    background-color: #137936;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  #randomizerDownloadBtn:hover { background-color: #189844; }
+
+  #randomizerCanvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+    border: 1px solid #333;
+  }
+
   /* ===================== SKYBOX JUMP SEARCH ===================== */
   .jump-search-input {
     background-color: #1a1a1a;
@@ -700,6 +750,15 @@
   </div>
 </div>
 
+<div id="randomizerPanel" class="randomizer-panel" style="display:none;">
+  <div class="randomizer-toolbar">
+    <span class="randomizer-live-dot" id="randomizerLiveDot"></span>
+    <span id="randomizerLiveText">Live - updates automatically as statuses change</span>
+    <button id="randomizerDownloadBtn">&#8681; Download PNG</button>
+  </div>
+  <canvas id="randomizerCanvas"></canvas>
+</div>
+
 <div id="kingdomView">
   <div>
     <input type="text" class="jump-search-input" id="skyboxJumpInput" list="skyboxDatalist" placeholder="Jump to skybox column...">
@@ -912,6 +971,7 @@
   let KINGDOMS = [];   // [{ slug, label, subareas: [...] }, ...] - loaded from kingdoms-config.json
   let currentUser = null; // the signed-in Firebase Auth user object, or null if signed out
   let isEditor = false;   // true only if currentUser's email exists in the authorizedEditors collection
+  let isAdmin = false;    // stricter than isEditor - only the admins collection, gates the Randomizer panel
   let SKYBOXES = [];   // shared 136-name list, same order for every Kingdom
   let activeSlug = null;
   let activeLabel = '';
@@ -919,9 +979,12 @@
   let currentData = {};        // { subareaName: { skyboxName: status } } for the CURRENTLY ACTIVE kingdom only
   let unsubscribeSnapshot = null; // stops the previous Kingdom's live listener when switching tabs
   let viewingGuide = false; // true while the Guide tab (authorizedEditors/admins only) is showing
+  let viewingRandomizer = false; // true while the Randomizer tab (admins only) is showing
   let kingdomsLoaded = false;   // kingdoms-config.json has finished loading
   let authResolvedOnce = false; // Firebase has told us the sign-in state at least once
   let initialViewChosen = false; // the landing tab (Guide vs first Kingdom) has been picked
+  let kingdomLiveListeners = []; // unsubscribe fns for the 17 always-on Randomizer progress listeners
+  let kingdomProgressLive = {};  // { slug: { filled, total } }, kept live by those listeners
 
   // Filters (shared across all Kingdoms, not reset when switching tabs)
   let hiddenStatuses = new Set(["Good to Use"]); // "Good to Use" hidden by default - the summary table is meant to highlight problems, not everything
@@ -965,6 +1028,7 @@
   onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     isEditor = false;
+    isAdmin = false;
 
     if (user) {
       // Checking ONLY this user's own documents - the security rules
@@ -977,19 +1041,25 @@
         getDoc(doc(db, 'admins', user.email))
       ]);
       isEditor = editorDoc.exists() || adminDoc.exists();
+      isAdmin = adminDoc.exists();
     }
 
     renderAuthWidget();
     // Re-draw the currently visible table so it switches between
     // editable dropdowns and read-only pills immediately, without
     // needing a page refresh or tab switch.
-    if (activeSlug && !viewingGuide) renderMainTable();
+    if (activeSlug && !viewingGuide && !viewingRandomizer) renderMainTable();
 
-    // Guide tab only exists for authorizedEditors/admins - rebuild the
-    // tab bar so it appears/disappears immediately on sign-in/out,
-    // and bail out of the Guide view if access was just lost.
+    // Guide tab only exists for authorizedEditors/admins, Randomizer only
+    // for admins - rebuild the tab bar so both appear/disappear immediately
+    // on sign-in/out, and bail out of either view if access was just lost.
     buildTabs();
     if (viewingGuide && !isEditor) switchKingdom(activeSlug || KINGDOMS[0].slug);
+    if (viewingRandomizer && !isAdmin) switchKingdom(activeSlug || KINGDOMS[0].slug);
+
+    // The 17 live progress listeners behind Randomizer are only worth
+    // paying for while someone with admin access is actually signed in.
+    setupKingdomLiveListeners();
 
     if (!authResolvedOnce) {
       // First time hearing from Firebase at all (either an already-signed-in
@@ -1005,6 +1075,35 @@
       showGuide();
     }
   });
+
+  // ===================== RANDOMIZER LIVE DATA (admins only) =====================
+  // Subscribes to all 17 Kingdom collections at once so the Randomizer
+  // graphic updates the moment any status changes anywhere, without
+  // needing the tab to be open when the change happens. Only running
+  // this for admins keeps it from costing reads for every visitor.
+  function teardownKingdomLiveListeners() {
+    kingdomLiveListeners.forEach(unsub => unsub());
+    kingdomLiveListeners = [];
+  }
+
+  function setupKingdomLiveListeners() {
+    teardownKingdomLiveListeners();
+    if (!isAdmin || !kingdomsLoaded) return;
+
+    KINGDOMS.forEach(k => {
+      const totalCells = k.subareas.length * SKYBOXES.length;
+      const unsub = onSnapshot(collection(db, k.slug), (snapshot) => {
+        let filled = 0;
+        snapshot.forEach(docSnap => {
+          const statuses = docSnap.data().statuses || {};
+          SKYBOXES.forEach(sb => { if ((statuses[sb] || "").trim() !== "") filled++; });
+        });
+        kingdomProgressLive[k.slug] = { filled, total: totalCells };
+        if (viewingRandomizer) drawRandomizerCanvas();
+      });
+      kingdomLiveListeners.push(unsub);
+    });
+  }
 
   // Picks the landing tab exactly once, as soon as both the Kingdom list
   // and the initial auth check are ready: Guide for a signed-in
@@ -1031,6 +1130,7 @@
     buildTabs();
     populateSkyboxDatalist();
     maybeChooseInitialView();
+    setupKingdomLiveListeners(); // no-op unless auth already resolved to an admin
   }
 
   function populateSkyboxDatalist() {
@@ -1057,6 +1157,15 @@
       tabBar.appendChild(guideBtn);
     }
 
+    // Randomizer is stricter than Guide - admins only, not every editor.
+    if (isAdmin) {
+      const randomizerBtn = document.createElement('button');
+      randomizerBtn.className = 'tab-btn randomizer-tab-btn';
+      randomizerBtn.textContent = 'Randomizer';
+      randomizerBtn.addEventListener('click', showRandomizer);
+      tabBar.appendChild(randomizerBtn);
+    }
+
     KINGDOMS.forEach(k => {
       const btn = document.createElement('button');
       btn.className = 'tab-btn';
@@ -1073,8 +1182,10 @@
     document.querySelectorAll('.tab-btn').forEach(btn => {
       if (btn.classList.contains('guide-tab-btn')) {
         btn.classList.toggle('active', viewingGuide);
+      } else if (btn.classList.contains('randomizer-tab-btn')) {
+        btn.classList.toggle('active', viewingRandomizer);
       } else {
-        btn.classList.toggle('active', !viewingGuide && btn.dataset.slug === activeSlug);
+        btn.classList.toggle('active', !viewingGuide && !viewingRandomizer && btn.dataset.slug === activeSlug);
       }
     });
   }
@@ -1083,10 +1194,173 @@
   function showGuide() {
     if (!isEditor) return; // defensive - the tab shouldn't exist otherwise
     viewingGuide = true;
+    viewingRandomizer = false;
     document.getElementById('kingdomView').style.display = 'none';
+    document.getElementById('randomizerPanel').style.display = 'none';
     document.getElementById('guidePanel').style.display = 'block';
     setActiveTabStyling();
   }
+
+  // ===================== RANDOMIZER (admins only) =====================
+  function showRandomizer() {
+    if (!isAdmin) return; // defensive - the tab shouldn't exist otherwise
+    viewingRandomizer = true;
+    viewingGuide = false;
+    document.getElementById('kingdomView').style.display = 'none';
+    document.getElementById('guidePanel').style.display = 'none';
+    document.getElementById('randomizerPanel').style.display = 'block';
+    setActiveTabStyling();
+    drawRandomizerCanvas();
+  }
+
+  // One tile per Kingdom, in display order - Dark Side and Darker Side
+  // share a single tile (two slugs, "X%/Y%") matching the original graphic.
+  // Icon files + badge colors extracted directly from the user's own
+  // "Randomizer Skybox State Graphic" Slides deck (SVG export) - real
+  // artwork, not approximated shapes.
+  const KINGDOM_TILES = [
+    { slugs: ['capKingdom'], label: 'Cap', icon: 'cap.png' },
+    { slugs: ['cascadeKingdom'], label: 'Cascade', icon: 'cascade.png' },
+    { slugs: ['sandKingdom'], label: 'Sand', icon: 'sand.png' },
+    { slugs: ['lakeKingdom'], label: 'Lake', icon: 'lake.png' },
+    { slugs: ['woodedKingdom'], label: 'Wooded', icon: 'wooded.png' },
+    { slugs: ['cloudKingdom'], label: 'Cloud', icon: 'cloud.png' },
+    { slugs: ['lostKingdom'], label: 'Lost', icon: 'lost.png' },
+    { slugs: ['metroKingdom'], label: 'Metro', icon: 'metro.png' },
+    { slugs: ['snowKingdom'], label: 'Snow', icon: 'snow.png' },
+    { slugs: ['seasideKingdom'], label: 'Seaside', icon: 'seaside.png' },
+    { slugs: ['luncheonKingdom'], label: 'Luncheon', icon: 'luncheon.png' },
+    { slugs: ['ruinedKingdom'], label: 'Ruined', icon: 'ruined.png' },
+    { slugs: ['bowsersKingdom'], label: "Bowser's", icon: 'bowsers.png' },
+    { slugs: ['moonKingdom'], label: 'Moon', icon: 'moon.png' },
+    { slugs: ['darkSide', 'darkerSide'], label: 'Dark/Darker', icon: 'darkdarker.png' },
+    { slugs: ['mushroomKingdom'], label: 'Mushroom', icon: 'mushroom.png' }
+  ];
+
+  function pctFor(slug) {
+    const p = kingdomProgressLive[slug];
+    if (!p || p.total === 0) return null;
+    return (p.filled / p.total) * 100;
+  }
+
+  function fmtPct(p) {
+    if (p === null) return '0%'; // no live data yet - starts at 0% until the real listener reports in
+    return (p % 1 === 0 ? p : p.toFixed(2)) + '%';
+  }
+
+  // ===================== RANDOMIZER ASSETS =====================
+  // The background (sunset gradient + mountains) and all 16 icons are the
+  // user's actual art, pulled from their "Randomizer Skybox State Graphic"
+  // Slides deck (SVG export) - real images, not redrawn shapes.
+  let randomizerAssetsPromise = null;
+  const randomizerImages = {}; // 'background' | icon filename -> loaded Image
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function loadRandomizerAssets() {
+    if (randomizerAssetsPromise) return randomizerAssetsPromise;
+    const files = ['background.png', ...KINGDOM_TILES.map(t => t.icon)];
+    randomizerAssetsPromise = Promise.all(
+      files.map(f => loadImage(`randomizer-icons/${f}`).then(img => { randomizerImages[f] = img; }))
+    );
+    return randomizerAssetsPromise;
+  }
+
+  // Redraws the whole graphic from kingdomProgressLive - called whenever
+  // any of the 17 live listeners fire while this tab is open, and once
+  // right when the tab is opened.
+  function drawRandomizerCanvas() {
+    const canvas = document.getElementById('randomizerCanvas');
+    if (!canvas) return;
+
+    if (!randomizerImages['background.png']) {
+      loadRandomizerAssets().then(() => { if (viewingRandomizer) drawRandomizerCanvas(); });
+      return;
+    }
+
+    const baseW = 1200, baseH = 400;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = baseW * dpr;
+    canvas.height = baseH * dpr;
+    canvas.style.aspectRatio = `${baseW} / ${baseH}`;
+
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, baseW, baseH);
+    ctx.drawImage(randomizerImages['background.png'], 0, 0, baseW, baseH);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round'; // thick stroked text + sharp letter corners (A/M/W/...) spikes badly with the default miter join
+    ctx.font = '900 40px -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = '#000';
+    ctx.fillStyle = '#fff';
+    ctx.strokeText('RANDOMIZER SKYBOX STATE', baseW / 2, 40);
+    ctx.fillText('RANDOMIZER SKYBOX STATE', baseW / 2, 40);
+
+    const cols = 8;
+    const colWidth = baseW / cols;
+    const rowTops = [78, 240];
+
+    KINGDOM_TILES.forEach((tile, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cx = colWidth * col + colWidth / 2;
+      const rowTop = rowTops[row];
+      const badgeCy = rowTop + 42;
+      const r = 34;
+
+      // No badge circle behind the icon - none of the original icons have
+      // one (some, like Cascade or Mushroom, just happen to BE circular).
+
+      const iconImg = randomizerImages[tile.icon];
+      if (iconImg) {
+        const iconSize = r * 1.7;
+        ctx.drawImage(iconImg, cx - iconSize / 2, badgeCy - iconSize / 2, iconSize, iconSize);
+      }
+
+      ctx.font = '800 15px -apple-system, "Segoe UI", Roboto, sans-serif';
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = '#000';
+      ctx.fillStyle = '#fff';
+      const nameY = rowTop + 96;
+      ctx.strokeText(tile.label, cx, nameY);
+      ctx.fillText(tile.label, cx, nameY);
+
+      const pctText = tile.slugs.length === 2
+        ? `${fmtPct(pctFor(tile.slugs[0]))}/${fmtPct(pctFor(tile.slugs[1]))}`
+        : fmtPct(pctFor(tile.slugs[0]));
+
+      ctx.font = '900 21px -apple-system, "Segoe UI", Roboto, sans-serif';
+      ctx.lineWidth = 4;
+      const pctY = rowTop + 128;
+      ctx.strokeText(pctText, cx, pctY);
+      ctx.fillText(pctText, cx, pctY);
+    });
+  }
+
+  document.getElementById('randomizerDownloadBtn').addEventListener('click', () => {
+    if (!isAdmin) return; // defensive - the button is unreachable in the DOM otherwise
+    const canvas = document.getElementById('randomizerCanvas');
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `randomizer-skybox-state-${new Date().toISOString().slice(0, 10)}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  });
 
   // ===================== SWITCHING KINGDOMS =====================
   function switchKingdom(slug) {
@@ -1094,7 +1368,9 @@
     if (!kingdom) return;
 
     viewingGuide = false;
+    viewingRandomizer = false;
     document.getElementById('guidePanel').style.display = 'none';
+    document.getElementById('randomizerPanel').style.display = 'none';
     document.getElementById('kingdomView').style.display = '';
 
     activeSlug = slug;
