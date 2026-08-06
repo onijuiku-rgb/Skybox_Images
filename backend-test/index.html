@@ -466,6 +466,85 @@
     cursor: default;
   }
 
+  /* Multi-select: ctrl/shift+click a cell to add it, then bulk-apply one
+     status to every selected cell instead of setting them one at a time. */
+  .status-trigger.selected {
+    outline: 3px solid #5865F2;
+    outline-offset: -1px;
+  }
+
+  /* A subtle cue for admins editing a cell that's locked for everyone else. */
+  .status-trigger.admin-locked-override {
+    border: 2px dashed #d97706;
+  }
+
+  /* ===================== LOCKING (admins only) ===================== */
+  .subarea-name-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .subarea-lock-btn {
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+
+  .subarea-lock-btn:hover { opacity: 1; border-color: #5865F2; }
+  .subarea-lock-btn.locked { opacity: 1; }
+
+  #kingdomLockBtn {
+    background-color: #1a1a1a;
+    border: 1px solid #3d3d3d;
+    color: #999;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  #kingdomLockBtn.locked {
+    background-color: #3a2408;
+    color: #d97706;
+    border-color: #d97706;
+  }
+
+  /* ===================== BULK MULTI-SELECT TOOLBAR ===================== */
+  .bulk-toolbar {
+    position: fixed;
+    bottom: 44px; /* sits just above the fixed bottom-bar */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #1e1f22;
+    border: 1px solid #5865F2;
+    border-radius: 10px;
+    padding: 10px 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    font-size: 13px;
+  }
+
+  #bulkToolbarCount { color: #ddd; font-weight: 600; white-space: nowrap; }
+
+  #bulkApplyBtn {
+    background-color: #5865F2;
+    border: none;
+    color: #fff;
+  }
+  #bulkApplyBtn:hover { background-color: #4752c4; }
+
   /* The custom dropdown panel a .status-trigger opens - one shared
      element reused for whichever cell is active, positioned next to
      that cell's trigger button. */
@@ -776,6 +855,7 @@
   <div class="summary-header">
     <h2>&#9888; Issues &amp; Actionable Skyboxes (<span id="activeKingdomName">-</span>)</h2>
     <div class="progress-badge" id="progressBadge"></div>
+    <button id="kingdomLockBtn" style="display:none;"></button>
     <div class="summary-controls">
       <button id="toggleFiltersBtn">Filters</button>
       <select class="summary-select-filter" id="subareaFilterSelect">
@@ -783,6 +863,12 @@
       </select>
       <input type="text" class="summary-search-input" id="searchInput" placeholder="Search subarea or skybox...">
     </div>
+  </div>
+
+  <div id="bulkToolbar" class="bulk-toolbar" style="display:none;">
+    <span id="bulkToolbarCount"></span>
+    <button id="bulkApplyBtn">Set status for selected&hellip;</button>
+    <button id="bulkClearBtn">Clear selection</button>
   </div>
 
   <div id="filterPanel"></div>
@@ -806,7 +892,8 @@
     getDoc,
     getDocs,
     setDoc,
-    onSnapshot
+    onSnapshot,
+    writeBatch
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
   import {
     getAuth,
@@ -978,6 +1065,15 @@
   let activeSubareas = [];
   let currentData = {};        // { subareaName: { skyboxName: status } } for the CURRENTLY ACTIVE kingdom only
   let unsubscribeSnapshot = null; // stops the previous Kingdom's live listener when switching tabs
+  let kingdomLockData = { kingdomLocked: false, lockedSubareas: {} }; // lock state for the CURRENTLY ACTIVE kingdom
+  let unsubscribeLockSnapshot = null; // stops the previous Kingdom's lock listener when switching tabs
+  // Multi-select, editors only: Map of composite key -> {subarea, sb}.
+  // Storing the pair alongside the key avoids re-parsing it back out of
+  // a joined string later, which would be ambiguous since both subarea
+  // and skybox names can contain "-" and other ordinary punctuation.
+  const SELECT_KEY_SEP = '\u0001';
+  function selectKey(subarea, sb) { return subarea + SELECT_KEY_SEP + sb; }
+  let selectedCells = new Map();
   let viewingGuide = false; // true while the Guide tab (authorizedEditors/admins only) is showing
   let viewingRandomizer = false; // true while the Randomizer tab (admins only) is showing
   let kingdomsLoaded = false;   // kingdoms-config.json has finished loading
@@ -1047,8 +1143,14 @@
     renderAuthWidget();
     // Re-draw the currently visible table so it switches between
     // editable dropdowns and read-only pills immediately, without
-    // needing a page refresh or tab switch.
-    if (activeSlug && !viewingGuide && !viewingRandomizer) renderMainTable();
+    // needing a page refresh or tab switch. The skeleton is rebuilt too,
+    // since that's what adds/removes the per-subarea lock buttons
+    // (admins only).
+    if (activeSlug && !viewingGuide && !viewingRandomizer) {
+      buildMainTableSkeleton();
+      renderMainTable();
+    }
+    renderKingdomLockButton();
 
     // Guide tab only exists for authorizedEditors/admins, Randomizer only
     // for admins - rebuild the tab bar so both appear/disappear immediately
@@ -1377,6 +1479,9 @@
     activeLabel = kingdom.label;
     activeSubareas = kingdom.subareas;
     currentData = {};
+    kingdomLockData = { kingdomLocked: false, lockedSubareas: {} };
+    selectedCells.clear(); // a selection from the previous Kingdom's table can't apply here
+    renderBulkToolbar();
 
     document.getElementById('activeKingdomName').textContent = activeLabel;
     setActiveTabStyling();
@@ -1387,6 +1492,7 @@
     // a new one - otherwise every past tab you've visited keeps updating
     // in the background forever, which is wasted reads and a memory leak.
     if (unsubscribeSnapshot) unsubscribeSnapshot();
+    if (unsubscribeLockSnapshot) unsubscribeLockSnapshot();
 
     unsubscribeSnapshot = onSnapshot(
       collection(db, slug),
@@ -1404,6 +1510,20 @@
         renderSummaryTable();
       },
       (err) => setStatusLine("Connection error: " + err.message, "error")
+    );
+
+    // Public read (like the Kingdom data itself) so locked rows render as
+    // read-only for every visitor, not just editors - only admins can write.
+    unsubscribeLockSnapshot = onSnapshot(
+      doc(db, 'kingdomLocks', slug),
+      (docSnap) => {
+        kingdomLockData = docSnap.exists()
+          ? { kingdomLocked: !!docSnap.data().kingdomLocked, lockedSubareas: docSnap.data().lockedSubareas || {} }
+          : { kingdomLocked: false, lockedSubareas: {} };
+        renderMainTable();
+        renderKingdomLockButton();
+      },
+      (err) => console.error('kingdomLocks listener error:', err)
     );
   }
 
@@ -1427,8 +1547,31 @@
       const row = document.createElement('tr');
       row.id = 'row-' + subarea;
       const nameTd = document.createElement('td');
-      nameTd.textContent = subarea;
-      nameTd.style.fontWeight = '600';
+      nameTd.className = 'subarea-name-cell';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = subarea;
+      nameSpan.style.fontWeight = '600';
+      nameTd.appendChild(nameSpan);
+
+      if (isAdmin) {
+        const lockBtn = document.createElement('button');
+        lockBtn.type = 'button';
+        lockBtn.className = 'subarea-lock-btn';
+        lockBtn.id = 'lockbtn-' + subarea;
+        lockBtn.title = 'Lock/unlock this subarea for editors';
+        lockBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const isLocked = !!(kingdomLockData.lockedSubareas && kingdomLockData.lockedSubareas[subarea]);
+          try {
+            await setDoc(doc(db, 'kingdomLocks', activeSlug), { lockedSubareas: { [subarea]: !isLocked } }, { merge: true });
+          } catch (err) {
+            setStatusLine("Error toggling lock: " + err.message, "error");
+          }
+        });
+        nameTd.appendChild(lockBtn);
+      }
+
       row.appendChild(nameTd);
       tbody.appendChild(row);
     });
@@ -1439,6 +1582,14 @@
       const row = document.getElementById('row-' + subarea);
       if (!row) return;
       const statuses = currentData[subarea] || {};
+
+      const isLocked = !!(kingdomLockData.kingdomLocked || (kingdomLockData.lockedSubareas && kingdomLockData.lockedSubareas[subarea]));
+
+      const lockBtn = document.getElementById('lockbtn-' + subarea);
+      if (lockBtn) {
+        lockBtn.textContent = isLocked ? '\u{1F512}' : '\u{1F513}'; // locked / unlocked padlock
+        lockBtn.classList.toggle('locked', isLocked);
+      }
 
       SKYBOXES.forEach(sb => {
         let cellId = 'cell-' + subarea + '-' + sb;
@@ -1451,10 +1602,10 @@
 
         const currentValue = statuses[sb] || "";
 
-        if (!isEditor) {
-          // Read-only view: a plain, non-interactive pill. This is what
-          // every visitor sees by default, and what non-approved signed-in
-          // users see too - only approved editors get the real dropdown.
+        // Locked rows are read-only for everyone except admins, who can
+        // still bypass a lock to fix a mistake - matches the security
+        // rules, which allow admin writes regardless of lock state.
+        if (!isEditor || (isLocked && !isAdmin)) {
           const pill = document.createElement('span');
           pill.className = 'status-pill-readonly ' + statusClass(currentValue);
           pill.textContent = currentValue === "" ? "-- Not set --" : currentValue;
@@ -1463,18 +1614,36 @@
           return;
         }
 
+        const key = selectKey(subarea, sb);
         const trigger = document.createElement('button');
         trigger.type = 'button';
         trigger.className = 'status-trigger ' + statusClass(currentValue);
+        trigger.classList.toggle('selected', selectedCells.has(key));
+        trigger.classList.toggle('admin-locked-override', isLocked && isAdmin);
         trigger.textContent = currentValue === "" ? "-- Select --" : currentValue;
         trigger.dataset.value = currentValue;
 
         trigger.addEventListener('click', (e) => {
           e.stopPropagation();
+
+          // Ctrl/Cmd/Shift+click toggles multi-select instead of opening
+          // the dropdown - lets you set the same status on a bunch of
+          // cells at once (e.g. the boss Rematch subareas, which are all
+          // the same skybox with a different painting) instead of one at
+          // a time.
+          if (e.ctrlKey || e.metaKey || e.shiftKey) {
+            if (selectedCells.has(key)) selectedCells.delete(key);
+            else selectedCells.set(key, { subarea, sb });
+            trigger.classList.toggle('selected', selectedCells.has(key));
+            renderBulkToolbar();
+            return;
+          }
+
           openStatusDropdown(trigger, trigger.dataset.value, async (newValue) => {
             trigger.dataset.value = newValue;
             trigger.textContent = newValue === "" ? "-- Select --" : newValue;
             trigger.className = 'status-trigger ' + statusClass(newValue);
+            trigger.classList.toggle('admin-locked-override', isLocked && isAdmin);
             try {
               await setDoc(doc(db, activeSlug, subarea), { statuses: { [sb]: newValue } }, { merge: true });
               setStatusLine(`Saved "${sb}" for ${subarea}.`, "connected");
@@ -1488,6 +1657,80 @@
         td.appendChild(trigger);
       });
     });
+  }
+
+  // ===================== KINGDOM-LEVEL LOCK (admins only) =====================
+  function renderKingdomLockButton() {
+    const btn = document.getElementById('kingdomLockBtn');
+    if (!isAdmin) { btn.style.display = 'none'; return; }
+
+    btn.style.display = 'inline-block';
+    const locked = !!kingdomLockData.kingdomLocked;
+    btn.textContent = locked ? '\u{1F512} Kingdom locked' : '\u{1F513} Lock entire Kingdom';
+    btn.classList.toggle('locked', locked);
+  }
+
+  document.getElementById('kingdomLockBtn').addEventListener('click', async () => {
+    if (!isAdmin || !activeSlug) return;
+    const locked = !!kingdomLockData.kingdomLocked;
+    try {
+      await setDoc(doc(db, 'kingdomLocks', activeSlug), { kingdomLocked: !locked }, { merge: true });
+    } catch (err) {
+      setStatusLine("Error toggling Kingdom lock: " + err.message, "error");
+    }
+  });
+
+  // ===================== BULK MULTI-SELECT TOOLBAR =====================
+  function renderBulkToolbar() {
+    const toolbar = document.getElementById('bulkToolbar');
+    const count = document.getElementById('bulkToolbarCount');
+    if (selectedCells.size === 0) {
+      toolbar.style.display = 'none';
+      return;
+    }
+    toolbar.style.display = 'flex';
+    count.textContent = `${selectedCells.size} cell${selectedCells.size === 1 ? '' : 's'} selected`;
+  }
+
+  document.getElementById('bulkClearBtn').addEventListener('click', () => {
+    selectedCells.clear();
+    renderMainTable();
+    renderBulkToolbar();
+  });
+
+  document.getElementById('bulkApplyBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (selectedCells.size === 0) return;
+    openStatusDropdown(document.getElementById('bulkApplyBtn'), '', applyBulkStatus);
+  });
+
+  // Groups the selection by subarea doc and writes them all in one batch -
+  // one write per affected subarea document (each can hold several
+  // skyboxes' worth of the same new status), not one write per cell.
+  async function applyBulkStatus(newValue) {
+    const bySubarea = {};
+    const cells = Array.from(selectedCells.values());
+
+    cells.forEach(({ subarea, sb }) => {
+      if (!bySubarea[subarea]) bySubarea[subarea] = {};
+      bySubarea[subarea][sb] = newValue;
+    });
+
+    const batch = writeBatch(db);
+    Object.entries(bySubarea).forEach(([subarea, statusesPatch]) => {
+      batch.set(doc(db, activeSlug, subarea), { statuses: statusesPatch }, { merge: true });
+    });
+
+    try {
+      await batch.commit();
+      setStatusLine(`Applied "${newValue || '(none)'}" to ${cells.length} cell(s).`, "connected");
+    } catch (err) {
+      setStatusLine("Error applying bulk status: " + err.message, "error");
+    }
+
+    selectedCells.clear();
+    renderMainTable();
+    renderBulkToolbar();
   }
 
   // ===================== PROGRESS COUNTER =====================
