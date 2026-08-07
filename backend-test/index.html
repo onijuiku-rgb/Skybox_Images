@@ -1074,6 +1074,13 @@
   const SELECT_KEY_SEP = '\u0001';
   function selectKey(subarea, sb) { return subarea + SELECT_KEY_SEP + sb; }
   let selectedCells = new Map();
+  // Ctrl/Cmd+drag rectangle-select state - Shift/Ctrl+click alone still
+  // toggles a single cell (handled in the click listener); this covers
+  // dragging across a block of cells to add all of them at once.
+  let dragSelecting = false;
+  let dragStart = null;   // { subarea, sb } where the drag began
+  let dragCurrent = null; // { subarea, sb } most recently dragged over
+  let didDragSelect = false; // true for one tick after a real (multi-cell) drag, so the trailing click doesn't also toggle
   let viewingGuide = false; // true while the Guide tab (authorizedEditors/admins only) is showing
   let viewingRandomizer = false; // true while the Randomizer tab (admins only) is showing
   let kingdomsLoaded = false;   // kingdoms-config.json has finished loading
@@ -1577,6 +1584,66 @@
     });
   }
 
+  // ===================== DRAG RECTANGLE MULTI-SELECT =====================
+  function isSubareaLockedForMe(subarea) {
+    const locked = !!(kingdomLockData.kingdomLocked || (kingdomLockData.lockedSubareas && kingdomLockData.lockedSubareas[subarea]));
+    return locked && !isAdmin; // admins can still select+write locked rows
+  }
+
+  // Every cell in the rectangle between two corners (inclusive), by row/
+  // column index rather than pixel position, so it doesn't matter how fast
+  // the pointer moves or which cells it actually passes over. Locked rows
+  // are skipped, since a batched write with even one locked cell in it
+  // would get rejected by the security rules for the WHOLE batch.
+  function cellsInRect(a, b) {
+    const rowA = activeSubareas.indexOf(a.subarea), rowB = activeSubareas.indexOf(b.subarea);
+    const colA = SKYBOXES.indexOf(a.sb), colB = SKYBOXES.indexOf(b.sb);
+    if (rowA === -1 || rowB === -1 || colA === -1 || colB === -1) return [];
+
+    const rowMin = Math.min(rowA, rowB), rowMax = Math.max(rowA, rowB);
+    const colMin = Math.min(colA, colB), colMax = Math.max(colA, colB);
+    const cells = [];
+    for (let r = rowMin; r <= rowMax; r++) {
+      const subarea = activeSubareas[r];
+      if (isSubareaLockedForMe(subarea)) continue;
+      for (let c = colMin; c <= colMax; c++) {
+        cells.push({ subarea, sb: SKYBOXES[c] });
+      }
+    }
+    return cells;
+  }
+
+  // Live preview while dragging: shows the committed selection plus
+  // whatever the current drag rectangle covers, recomputed on every cell
+  // the pointer enters.
+  function updateDragPreview() {
+    const rectKeys = new Set(
+      (dragStart && dragCurrent ? cellsInRect(dragStart, dragCurrent) : [])
+        .map(c => selectKey(c.subarea, c.sb))
+    );
+    document.querySelectorAll('.status-trigger').forEach(btn => {
+      const key = selectKey(btn.dataset.subarea, btn.dataset.sb);
+      btn.classList.toggle('selected', selectedCells.has(key) || rectKeys.has(key));
+    });
+  }
+
+  function finalizeDragSelect() {
+    didDragSelect = !!(dragStart && dragCurrent && (dragStart.subarea !== dragCurrent.subarea || dragStart.sb !== dragCurrent.sb));
+    if (dragStart && dragCurrent) {
+      cellsInRect(dragStart, dragCurrent).forEach(({ subarea, sb }) => {
+        selectedCells.set(selectKey(subarea, sb), { subarea, sb });
+      });
+    }
+    dragSelecting = false;
+    dragStart = null;
+    dragCurrent = null;
+    renderBulkToolbar();
+  }
+
+  document.addEventListener('pointerup', () => {
+    if (dragSelecting) finalizeDragSelect();
+  });
+
   function renderMainTable() {
     activeSubareas.forEach(subarea => {
       const row = document.getElementById('row-' + subarea);
@@ -1622,15 +1689,44 @@
         trigger.classList.toggle('admin-locked-override', isLocked && isAdmin);
         trigger.textContent = currentValue === "" ? "-- Select --" : currentValue;
         trigger.dataset.value = currentValue;
+        trigger.dataset.subarea = subarea;
+        trigger.dataset.sb = sb;
+
+        // Ctrl/Cmd+drag across a block of cells rectangle-selects all of
+        // them at once (by row/column, not just whatever the pointer
+        // happens to pass over). A plain click still opens the dropdown;
+        // Shift/Ctrl/Cmd+click with no drag still toggles just this one
+        // cell, handled below in the click listener.
+        trigger.addEventListener('pointerdown', (e) => {
+          if (!(e.ctrlKey || e.metaKey)) return;
+          e.preventDefault();
+          dragSelecting = true;
+          dragStart = { subarea, sb };
+          dragCurrent = { subarea, sb };
+          updateDragPreview();
+        });
+
+        trigger.addEventListener('pointerenter', () => {
+          if (!dragSelecting) return;
+          dragCurrent = { subarea, sb };
+          updateDragPreview();
+        });
 
         trigger.addEventListener('click', (e) => {
           e.stopPropagation();
 
-          // Ctrl/Cmd/Shift+click toggles multi-select instead of opening
-          // the dropdown - lets you set the same status on a bunch of
-          // cells at once (e.g. the boss Rematch subareas, which are all
-          // the same skybox with a different painting) instead of one at
-          // a time.
+          // A completed drag already updated the selection on pointerup -
+          // don't let the trailing click toggle the cell it ended on too.
+          if (didDragSelect) {
+            didDragSelect = false;
+            return;
+          }
+
+          // Ctrl/Cmd/Shift+click (no drag) toggles multi-select instead of
+          // opening the dropdown - lets you set the same status on a bunch
+          // of cells at once (e.g. the boss Rematch subareas, which are
+          // all the same skybox with a different painting) instead of one
+          // at a time.
           if (e.ctrlKey || e.metaKey || e.shiftKey) {
             if (selectedCells.has(key)) selectedCells.delete(key);
             else selectedCells.set(key, { subarea, sb });
