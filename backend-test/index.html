@@ -1744,6 +1744,20 @@
               await setDoc(doc(db, activeSlug, subarea), { statuses: { [sb]: newValue } }, { merge: true });
               setStatusLine(`Saved "${sb}" for ${subarea}.`, "connected");
             } catch (err) {
+              // A stale cached ID token could carry different claims than
+              // what currentUser.email shows - force a fresh token and
+              // retry once before giving up, in case that's the cause.
+              if (err.code === 'permission-denied' && currentUser) {
+                try {
+                  await currentUser.getIdToken(true);
+                  await setDoc(doc(db, activeSlug, subarea), { statuses: { [sb]: newValue } }, { merge: true });
+                  setStatusLine(`Saved "${sb}" for ${subarea}. (needed a fresh sign-in token)`, "connected");
+                  return;
+                } catch (retryErr) {
+                  setStatusLine("Error saving: " + retryErr.message, "error");
+                  return;
+                }
+              }
               setStatusLine("Error saving: " + err.message, "error");
             }
           });
@@ -1812,16 +1826,32 @@
       bySubarea[subarea][sb] = newValue;
     });
 
-    const batch = writeBatch(db);
-    Object.entries(bySubarea).forEach(([subarea, statusesPatch]) => {
-      batch.set(doc(db, activeSlug, subarea), { statuses: statusesPatch }, { merge: true });
-    });
+    const buildBatch = () => {
+      const b = writeBatch(db);
+      Object.entries(bySubarea).forEach(([subarea, statusesPatch]) => {
+        b.set(doc(db, activeSlug, subarea), { statuses: statusesPatch }, { merge: true });
+      });
+      return b;
+    };
 
     try {
-      await batch.commit();
+      await buildBatch().commit();
       setStatusLine(`Applied "${newValue || '(none)'}" to ${cells.length} cell(s).`, "connected");
     } catch (err) {
-      setStatusLine("Error applying bulk status: " + err.message, "error");
+      // A batch can only be committed once, so a retry needs a fresh one -
+      // same reasoning as the single-cell save: a stale cached ID token
+      // could be why this was denied, so refresh and try again once.
+      if (err.code === 'permission-denied' && currentUser) {
+        try {
+          await currentUser.getIdToken(true);
+          await buildBatch().commit();
+          setStatusLine(`Applied "${newValue || '(none)'}" to ${cells.length} cell(s). (needed a fresh sign-in token)`, "connected");
+        } catch (retryErr) {
+          setStatusLine("Error applying bulk status: " + retryErr.message, "error");
+        }
+      } else {
+        setStatusLine("Error applying bulk status: " + err.message, "error");
+      }
     }
 
     selectedCells.clear();
